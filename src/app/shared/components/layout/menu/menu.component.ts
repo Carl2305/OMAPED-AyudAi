@@ -1,5 +1,6 @@
 import { NgFor, NgIf } from '@angular/common';
 import { Component, HostListener, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 interface SubMenuItem {
   title: string;
@@ -59,7 +60,9 @@ export class MenuComponent implements OnInit {
   isMobileMenuOpen = false;
   activeMenuItem: string = '/';
 
-  constructor() {}
+  constructor(
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     // Inicializar el estado expanded de los items
@@ -116,7 +119,7 @@ export class MenuComponent implements OnInit {
   setActiveItem(link: string): void {
     this.activeMenuItem = link;
     // Aquí puedes añadir lógica de navegación si usas Router
-    // this.router.navigate([link]);
+    this.router.navigate([link]);
   }
 
   navigateToSubmenu(submenuItem: SubMenuItem): void {

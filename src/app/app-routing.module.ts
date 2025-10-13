@@ -40,18 +40,42 @@ export const routes: Routes = [
           breadcrumb: 'Inicio',
         }
       },
-      // // Transacciones - Usuarios y Admins
-      // {
-      //   path: 'transactions',
-      //   loadChildren: () => import('./features/transactions/transactions.module').then(m => m.TransactionsModule),
-      //   canActivate: [RoleGuard],
-      //   title: 'Transacciones - Financial App',
-      //   data: {
-      //     roles: ['USER', 'ADMIN', 'MANAGER'],
-      //     breadcrumb: 'Transacciones',
-      //     permissions: ['view_transactions']
-      //   }
-      // },
+      // Registro de Beneficiarios 
+      {
+        path: 'beneficiary-registration',
+        loadChildren: () => import('./features/beneficiary-registration/beneficiary-registration.module').then(m => m.BeneficiaryRegistrationModule),
+        //canActivate: [RoleGuard],
+        title: 'Registro de Beneficiarios - AyudAi',
+        data: {
+          roles: ['USER', 'ADMIN', 'MANAGER'],
+          breadcrumb: 'Registro de Beneficiarios',
+          //permissions: ['view_transactions'] //habilitar cuando se tenga el sistema de permisos
+        }
+      },
+      // Clasificación y Priorización 
+      {
+        path: 'classification-prioritization',
+        loadChildren: () => import('./features/classification-prioritization/classification-prioritization.module').then(m => m.ClassificationPrioritizationModule),
+        //canActivate: [RoleGuard],
+        title: 'Clasificación y Priorización - AyudAi',
+        data: {
+          roles: ['USER', 'ADMIN', 'MANAGER'],
+          breadcrumb: 'Clasificación y Priorización',
+          //permissions: ['view_transactions'] //habilitar cuando se tenga el sistema de permisos
+        }
+      },
+      // Reportes y Auditoría 
+      {
+        path: 'reports-audit',
+        loadChildren: () => import('./features/reports-audit/reports-audit.module').then(m => m.ReportsAuditModule),
+        //canActivate: [RoleGuard],
+        title: 'Reportes y Auditoría - AyudAi',
+        data: {
+          roles: ['USER', 'ADMIN', 'MANAGER'],
+          breadcrumb: 'Reportes y Auditoría',
+          //permissions: ['view_transactions'] //habilitar cuando se tenga el sistema de permisos
+        }
+      },
       // // Cuentas - Usuarios y Admins
       // {
       //   path: 'accounts',
