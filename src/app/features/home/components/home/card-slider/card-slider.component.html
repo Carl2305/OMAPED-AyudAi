@@ -1,0 +1,71 @@
+<div class="slider-container">
+
+  <div class="slider" *ngIf="totalSlides > 0">
+    <!-- Slides dinámicos basados en condiciones -->
+    <div style="position: absolute; width: 100%; height: 100%;">
+      <div *ngFor="let slide of visibleSlides; let i = index" [ngClass]="getSlideClass(i)">
+
+      <!-- Badge NUEVO para slide de pagos cuando está habilitado -->
+      <div *ngIf="getSlideType(i) === 'payment' && enablePaymentFeature" class="badge">¡NUEVO!</div>
+
+      <!-- Contenido del slide credit vehicle -->
+      <div class="slide-item-wrap" *ngIf="getSlideType(i) === 'credit-vehicle'">
+        <div class="slide-content">
+          <h2 class="slide-title">Adquiere tu crédito vehicular</h2>
+          <p class="slide-subtitle">!Dale un impulso a tus planes de movilidad! </p>
+        </div>
+        <div class="slide-icon">
+          <div class="credit-vehivle-img">
+            <img class="img" [src]="'assets/images/logos/logo-maf.png'" alt="Crédito Vehicular" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenido del slide FAQ -->
+      <div class="slide-item-wrap" *ngIf="getSlideType(i) === 'faq'">
+        <div class="slide-icon">
+          <div class="help-icon">❓</div>
+        </div>
+        <div class="slide-content">
+          <h2 class="slide-title">¿Tienes dudas?</h2>
+          <p class="slide-subtitle">Despeja tus dudas visitando nuestro módulo de <strong>Preguntas Frecuentes</strong></p>
+        </div>
+      </div>
+
+      <div class="slide-item-wrap" *ngIf="getSlideType(i) === 'faq1'">
+        <div class="slide-icon">
+          <div class="help-icon">?</div>
+        </div>
+        <div class="slide-content">
+          <h2 class="slide-title">¿Tienes dudas?</h2>
+          <p class="slide-subtitle">Despeja tus dudas visitando nuestro módulo de <strong>Preguntas Frecuentes</strong></p>
+        </div>
+      </div>
+
+    </div>
+    </div>
+  </div>
+
+
+
+  <!-- Indicadores de puntos (solo si hay más de 1 slide) -->
+  <div *ngIf="totalSlides > 1" class="dots-container">
+    <div *ngFor="let slide of visibleSlides; let i = index" class="dot" [class.active]="isActiveSlide(i)"
+      (click)="goToSlide(i)" [attr.aria-label]="'Ir al slide ' + (i + 1)">
+    </div>
+
+    <!-- Botones de navegación (solo si hay más de 1 slide) -->
+    <button *ngIf="totalSlides > 1" class="nav-button nav-prev" (click)="prevSlide()" aria-label="Slide anterior">
+      ‹
+    </button>
+
+    <button *ngIf="totalSlides > 1" class="nav-button nav-next" (click)="nextSlide()" aria-label="Slide siguiente">
+      ›
+    </button>
+  </div>
+
+  <!-- Mensaje cuando no hay slides visibles -->
+  <div *ngIf="totalSlides === 0" class="no-slides-message">
+    <p>No hay contenido disponible para mostrar</p>
+  </div>
+</div>

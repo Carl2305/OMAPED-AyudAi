@@ -1,0 +1,224 @@
+.auth-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 480px;
+  position: relative;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.auth-background {
+  position: relative;
+  // background: linear-gradient(135deg, #E40521 0%, #E86677 100%);
+  background: linear-gradient(135deg, #E86677 0%, var(--color-rojo) 70%);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+
+  .auth-background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  .auth-background-shapes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+
+      &.shape-1 {
+        width: 200px;
+        height: 200px;
+        top: 20%;
+        left: 10%;
+        animation: float 6s ease-in-out infinite;
+      }
+
+      &.shape-2 {
+        width: 150px;
+        height: 150px;
+        top: 60%;
+        right: 15%;
+        animation: float 8s ease-in-out infinite reverse;
+      }
+
+      &.shape-3 {
+        width: 100px;
+        height: 100px;
+        bottom: 20%;
+        left: 60%;
+        animation: float 7s ease-in-out infinite;
+      }
+    }
+  }
+}
+
+.auth-brand-sidebar {
+  position: relative;
+  z-index: 2;
+  color: white;
+  text-align: center;
+  max-width: 400px;
+
+  .brand-logo {
+    width: 200px;
+    // height: 90px;
+    margin-bottom: 24px;
+    filter: brightness(0) invert(1);
+  }
+
+  .brand-title {
+    font-family: var(--bebas-pro-bold);
+    font-size: 64px;
+    margin: 0 0 12px 0;
+  }
+
+  .brand-subtitle {
+    font-family: var(--bebas-pro-regular);
+    font-size: 32px;
+    opacity: 0.9;
+    margin: 0 0 48px 0;
+  }
+
+  .features-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-family: var(--bebas-pro-book);
+      font-size: 26px;
+
+      .feature-icon {
+        width: 24px;
+        height: 24px;
+        opacity: 0.9;
+      }
+    }
+  }
+}
+
+.auth-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: white;
+
+  @media (max-width: 1024px) {
+    background: linear-gradient(135deg, #E86677 0%, #E40521 50%);
+  }
+}
+
+.auth-brand-mobile {
+  display: none;
+  padding: 40px 40px 0;
+  text-align: center;
+  color: white;
+
+  @media (max-width: 1024px) {
+    display: block;
+  }
+
+  .brand-logo {
+    width: 150px;
+    // height: 60px;
+    margin-bottom: 16px;
+    filter: brightness(0) invert(1);
+  }
+
+  .brand-title {
+    font-family: var(--bebas-pro-bold);
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+  }
+
+  .brand-subtitle {
+    font-family: var(--bebas-pro-regular);
+    font-size: 24px;
+    opacity: 0.9;
+    margin: 0;
+  }
+}
+
+.auth-form-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @media (max-width: 1024px) {
+    padding: 20px;
+  }
+}
+
+.auth-footer {
+  padding: 20px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--arial-narrow-regular);
+  font-size: 16px;
+  color: #718096;
+
+  p {
+    margin: 0px;
+    text-align: center;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+
+  @media (max-width: 1024px) {
+    background: rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 20px;
+
+    .footer-link {
+      color: inherit;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}

@@ -1,0 +1,55 @@
+<div class="auth-layout">
+  <div class="auth-background">
+    <div class="auth-background-overlay"></div>
+    <div class="auth-background-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+
+    <div class="auth-brand-sidebar">
+      <img src="assets/images/logos/logo-maf.png" alt="AyudAi" class="brand-logo">
+      <h2 class="brand-title">AyudAi</h2>
+      <p class="brand-subtitle">Gestiona tus créditos de forma segura</p>
+
+      <div class="features-list">
+        <div class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z"/>
+          </svg>
+          <span>Seguridad</span>
+        </div>
+        <div class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16,6L18.29,8.29L13.41,13.17L9.41,9.17L2,16.59L3.41,18L9.41,12L13.41,16L19.71,9.71L22,12V6H16Z"/>
+          </svg>
+          <span>Análisis en tiempo real</span>
+        </div>
+        <div class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M11,6V14L17.25,10.15L18.75,12.85L11,17.75V6H11Z"/>
+          </svg>
+          <span>Disponible 24/7</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-content">
+    <div class="auth-brand-mobile">
+      <img [src]="'/assets/images/logos/logo-maf.png'" alt="AyudAi" class="brand-logo">
+      <h2 class="brand-title">AyudAi</h2>
+      <!-- <p class="brand-subtitle">Gestiona tus créditos de forma segura</p> -->
+    </div>
+    <div class="auth-form-container">
+      <router-outlet />
+    </div>
+    <footer class="auth-footer">
+      <p>&copy; {{ currentYear }} MAF Perú. Todos los derechos reservados.</p>
+      <!-- <div class="footer-links">
+        <a href="#" class="footer-link">Términos</a>
+        <a href="#" class="footer-link">Privacidad</a>
+        <a href="#" class="footer-link">Soporte</a>
+      </div> -->
+    </footer>
+  </div>
+</div>

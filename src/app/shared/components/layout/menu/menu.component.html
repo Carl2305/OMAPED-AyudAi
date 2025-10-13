@@ -1,0 +1,47 @@
+<nav class="nav-container fade-in">
+    <div class="nav-header">
+        <div class="nav-title">
+            Menú Principal
+        </div>
+        <button class="menu-toggle" id="menuToggle" (click)="toggleMobileMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+    <div class="nav-tabs" id="navTabs">
+        <div
+            *ngFor="let item of menuData.menu"
+            class="nav-item-container"
+            [class.has-submenu]="item.submenu && item.submenu.length > 0"
+            [class.expanded]="item.expanded">
+
+            <button
+                class="nav-tab"
+                [class.active]="isParentActive(item)"
+                [class.has-submenu-btn]="item.submenu && item.submenu.length > 0"
+                (click)="toggleSubmenu(item, $event)">
+                <i [class]="item.icon"></i>
+                {{ item.title }}
+                <i
+                    *ngIf="item.submenu && item.submenu.length > 0"
+                    class="fas fa-chevron-down submenu-arrow"
+                    [class.rotated]="item.expanded"></i>
+            </button>
+
+            <!-- Submenu -->
+            <div
+                *ngIf="item.submenu && item.submenu.length > 0"
+                class="submenu"
+                [class.show]="item.expanded">
+                <button
+                    *ngFor="let subItem of item.submenu"
+                    class="submenu-item"
+                    [class.active]="isActive(subItem.link)"
+                    (click)="navigateToSubmenu(subItem)">
+                    <i *ngIf="subItem.icon" [class]="subItem.icon"></i>
+                    <span class="submenu-dot" *ngIf="!subItem.icon"></span>
+                    {{ subItem.title }}
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>

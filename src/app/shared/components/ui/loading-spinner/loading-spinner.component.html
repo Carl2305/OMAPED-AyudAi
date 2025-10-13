@@ -1,0 +1,10 @@
+<div
+  *ngIf="isLoading"
+  class="loading-overlay"
+  [class.global]="isGlobal"
+>
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p *ngIf="message" class="loading-message">{{ message }}</p>
+  </div>
+</div>

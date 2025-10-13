@@ -1,0 +1,14 @@
+<div class="widget fade-in">
+  <h3 class="widget-title">
+    <i class="fas fa-share-alt"></i>
+    Síguenos
+  </h3>
+  <p class="widget-sub-title">
+    Mantente al día con nuestras novedades
+  </p>
+  <div class="social-links">
+    <a *ngFor="let link of socialLinks" [href]="link.url" [class]="'social-link ' + link.class" [title]="link.name" target="_blank" rel="noopener noreferrer" >
+      <i [class]="link.icon"></i>
+    </a>
+  </div>
+</div>

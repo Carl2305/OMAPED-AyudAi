@@ -1,0 +1,14 @@
+<div class="numeric-keyboard" *ngIf="loadedKeyboard">
+  <div class="keyboard-grid">
+    <div class="key" *ngFor="let key of keyboard?.botones; let i = index">
+      <img class="img" [src]="key.imagenBase64" alt="key" (click)="onKeyPress(key)">
+    </div>
+    <div class="key">
+      <img class="img" (click)="onBackspace()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAmCAYAAAC/H3lnAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAPRSURBVHgB7ZhfSFNRHMd/bnMs/9beJgU99NJDRUVg0VM0KSU10xGi1obkP6gcQWVFFv2RogYrxwY2xcRgI1OJXqZlNfrzYlEE+WiB7qlJ6Ybtj32PbLHdzbvdO/+87AOXc8/vnp3zvb/zO79z7ojSpEmTho+MZBt2d3cr5ufnT2ZkZOzEJacVYmFhwRsIBJxSqXSwoaHBw32elGCDwbA+Ozvbis7KUJXQ6jA4PT19rL29PRhpTGrw3NzcSog9SqsnllGuUqn2cI0JBVgsll2Youu0BiD0tnBtvIIxHXL86BpuVbQGwFGZXBuvYExJMULhEPHDYuwuXmyYkuMT+mxD6ScRLCnYaDTmoTDgktHSBDH4eSyOtqysrFqIfsjTlmWAMaz+g0ql8g7uK2GaoeUQXFVVJVUoFPdxu5n4mQgGg48QOv6amprfDofjLIQ44jXEy4yjbUV9ff0vjUYTyMnJeQXze1oOwUVFRfsw8AlKzFaJRDLa1dWlZBW73R7wer2aOJ52op26ubnZzSodHR35Ho+HtTlMAokRDG/J4IkHxB8K/2EbCRbHmMlk2sDqra2tM1NTU2fwws9Cz9/K5fIjzLOs3tfXl4eQ6MXzWhJBjOCCgoI6FDtIGNvgwaGwaJbs4WkdRN2GvVyr1S7GasizN2EvJZFE7XQYcDcWxUvc5pE4vvr9/pKWlpaf3AfI5/kQOgCPH6AkwUxrm5qaeiJtUR6G2HMpiGVsQx+mcEyHYYsYQm8IEbsUUYLhAQWlCEKAXdlcO/rOJ5G5N6r/yAo8cBEdu0k8nxESdTqdLiokWPYYGRnRov8XlCJRgnGc+47iKonjNcSWhlMXi1mExr3Ozs5NrM5Ez83NsVT5mFLwdEyWgBfMKD6SMJxIXeXhxRaK2V6kO71MJuuPTHkhTz8hkcQIhpd9CItLuP1DyeHMzMysDqcu5lm1Wm2NSF37sRCHOZ4+HcrTgj0dd6drbGwchRd6KAEY9AfEVoRjNpS6+nFVc5oy0Tar1boomnkam8dxtHtHApHwiLmCYoJ4wEtt9Pl8p2w2mzQUBkZcxRRnl4S9EDFuCXva7Xazw4/QDYr/E8lsNpdhoKe4lfI0Yye2W0hl21HGFRsJ2nyAt4ewKVxANZ+vbbyNg7dzTNtzeIKdvvjOxBK81GUIoWRgnoaQQhIJ7wGeHQNDoeGiNQAz4ePaEn7TuVyucYhmn0kBWkXYjGFBf+HaEwpmJy+EhlXAJ1DKMLEYzz45OfmN+yzpP1LYgQYZoQSLay86XEcrx1+M8WZ2dnZAr9d7KU2aNGkE8Q89Vast4qtZcAAAAABJRU5ErkJggg==" alt="key">
+    </div>
+    <div class="key">
+      <img class="img" (click)="onClear()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAmCAYAAAC/H3lnAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAIYSURBVHgB7ZjPbcIwGMU/EP9uZQS6QZmgZYLSCVoOCBCH0gkKE7QcECCQaCdoNygjsEEzQo5cgL5XkSpACDY2QtD8JEuO/cV5MfbzF0QiIk6bmFig0+lcxePxbFjMfD536/X6RAwxFjwYDJ4hpqkSi5dqlsvllhigJLjX673iYRfr7YvFgrNaFD0+Y7GYGzCWW6lUnnbdnBAF8IBbDJgTOxQxVlC7g7JTcFxODKUZns1mbcxyVg4Ilpwr54iWS/T7/W85ANhsl6qxSkvCR06OzMltukjwobElmJbkhPQ7yxhjbAh2kEvkUQqobyQ38O9JKpVif17CX0oJXZfYEIND5a5WqznLpjzzDrQ/8gIi39H3sOxzu91uAQfEB+pXsidGM4ycgGnlSvJTrVYbENpi8Yn9JZlMXouBWKJ7cARmLSppY1gaioNDWYeVTUcheJmXbf3sU82Zd2HT1opYo7n1xtFotE/OvBUrgrn56BK+zfdHqVRytznIPhgLphNgM62I5Tcei3fNPlhbgbFiiJFgzOyYTsBZ9NqGw+F9IpH4YmHda2cMY3mPGGBqazf+zUYngC+/ocp1m2WdbV4/Y3mPGGDF1riGIWSMaiOon7ZHodvE6tia0UnnwQNEQg4EW5ZGzj5bO/qHopZg/PTGthQwZlsnXktwOp1u6j4gDI7FMXXu2eu/NR630+nUKOvKZDITv39HRPwXfgD6/+zQndliugAAAABJRU5ErkJggg==" alt="key">
+    </div>
+  </div>
+  <div *ngIf="loading" class="loading-text">Cargando...</div>
+</div>

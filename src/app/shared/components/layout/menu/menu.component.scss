@@ -1,0 +1,274 @@
+.nav-container {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 10px;
+  z-index: 100;
+
+  .nav-header {
+    display: none;
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+
+    .nav-title {
+      font-weight: 600;
+      color: #2d3748;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .menu-toggle {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #4a5568;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(229, 62, 62, 0.1);
+        color: #e53e3e;
+      }
+    }
+  }
+
+  .nav-tabs {
+    display: flex;
+    gap: 5px;
+    padding: 10px;
+    transition: all 0.3s ease;
+    justify-content: space-around;
+
+
+    .nav-item-container {
+      position: relative;
+
+      &.has-submenu {
+        .nav-tab {
+          position: relative;
+        }
+      }
+
+      .nav-tab {
+        font-family: var(--arial-narrow-bold);
+        background: transparent;
+        border: none;
+        padding: 15px 25px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        color: #4a5568;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 2px solid transparent;
+        position: relative;
+
+        .submenu-arrow {
+          margin-left: auto;
+          font-size: 0.8rem;
+          transition: transform 0.3s ease;
+
+          &.rotated {
+            transform: rotate(180deg);
+          }
+        }
+
+        &:hover {
+          background: rgba(229, 62, 62, 0.1);
+          color: #e53e3e;
+          transform: translateY(-2px);
+          border-color: rgba(229, 62, 62, 0.2);
+        }
+
+        &.active {
+          background: linear-gradient(135deg, var(--color-rojo), #e53e3e);
+          color: white;
+          box-shadow: 0 5px 15px rgba(229, 62, 62, 0.3);
+        }
+      }
+
+      // Submenu styles for desktop
+      .submenu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        min-width: 190px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+
+        &.show {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0);
+        }
+
+        .submenu-item {
+          font-family: var(--arial-narrow-regular);
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 20px;
+          background: transparent;
+          border: none;
+          color: #4a5568;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          border-radius: 8px;
+          margin: 5px;
+          width: calc(100% - 10px);
+          text-align: left;
+
+          .submenu-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #cbd5e0;
+            flex-shrink: 0;
+          }
+
+          &:hover {
+            background: rgba(229, 62, 62, 0.1);
+            color: #e53e3e;
+
+            .submenu-dot {
+              background: #e53e3e;
+            }
+          }
+
+          &.active {
+            background: linear-gradient(135deg, var(--color-rojo), #e53e3e);
+            color: white;
+
+            .submenu-dot {
+              background: white;
+            }
+          }
+        }
+      }
+
+      // Hover effect for desktop submenus
+      &:hover .submenu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .nav-container {
+    overflow: hidden;
+
+    .nav-header {
+      display: flex;
+    }
+
+    .nav-tabs {
+      flex-direction: column;
+      gap: 0;
+      padding: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease-in-out;
+      opacity: 0;
+      visibility: hidden;
+      margin: 0;
+
+      .nav-item-container {
+        .nav-tab {
+          justify-content: flex-start;
+          padding: 15px 20px;
+          margin: 0;
+          transform: translateX(-20px);
+          transition: all 0.3s ease, transform 0.3s ease;
+          border-radius: 0;
+          width: 100%;
+          border-radius: 10px;
+
+          .submenu-arrow {
+            margin-left: auto;
+          }
+        }
+
+        // Mobile submenu styles
+        .submenu {
+          position: static;
+          background: rgba(229, 62, 62, 0.05);
+          box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+          border-radius: 4px;
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.3s ease;
+          opacity: 1;
+          visibility: visible;
+          transform: none;
+          border: none;
+          width: 95%;
+          margin-left: 5%;
+
+          &.show {
+            max-height: 300px;
+          }
+
+          .submenu-item {
+            padding: 10px 40px;
+            margin: 0;
+            width: 100%;
+            border-radius: 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+            &:last-child {
+              border-bottom: none;
+            }
+          }
+        }
+
+        &.expanded .submenu {
+          max-height: 300px;
+        }
+      }
+
+      &.expanded {
+        max-height: 800px;
+        padding: 15px 20px;
+        opacity: 1;
+        visibility: visible;
+        gap: 0;
+
+        .nav-item-container {
+          .nav-tab {
+            transform: translateX(0);
+          }
+
+          &:nth-child(1) .nav-tab { transition-delay: 0.1s; }
+          &:nth-child(2) .nav-tab { transition-delay: 0.15s; }
+          &:nth-child(3) .nav-tab { transition-delay: 0.2s; }
+          &:nth-child(4) .nav-tab { transition-delay: 0.25s; }
+          &:nth-child(5) .nav-tab { transition-delay: 0.3s; }
+          &:nth-child(6) .nav-tab { transition-delay: 0.35s; }
+        }
+      }
+    }
+
+  }
+}
