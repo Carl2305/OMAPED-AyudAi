@@ -12,15 +12,16 @@ export const routes: Routes = [
   {
     path: '',
     redirectTo: '/home',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   // Rutas de autenticación (usuarios no autenticados)
   {
     path: 'auth',
     component: AuthLayoutComponent,
     //canActivate: [GuestGuard], // Solo usuarios no autenticados
-    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule),
-    title: 'Autenticación - AyudAi'
+    loadChildren: () =>
+      import('./features/auth/auth.module').then((m) => m.AuthModule),
+    title: 'Autenticación - AyudAi',
   },
   // Rutas principales (usuarios autenticados)
   {
@@ -38,43 +39,52 @@ export const routes: Routes = [
         data: {
           roles: ['USER'],
           breadcrumb: 'Inicio',
-        }
+        },
       },
-      // Registro de Beneficiarios 
+      // Registro de Beneficiarios
       {
         path: 'beneficiary-registration',
-        loadChildren: () => import('./features/beneficiary-registration/beneficiary-registration.module').then(m => m.BeneficiaryRegistrationModule),
+        loadChildren: () =>
+          import(
+            './features/beneficiary-registration/beneficiary-registration.module'
+          ).then((m) => m.BeneficiaryRegistrationModule),
         //canActivate: [RoleGuard],
         title: 'Registro de Beneficiarios - AyudAi',
         data: {
           roles: ['USER', 'ADMIN', 'MANAGER'],
           breadcrumb: 'Registro de Beneficiarios',
           //permissions: ['view_transactions'] //habilitar cuando se tenga el sistema de permisos
-        }
+        },
       },
-      // Clasificación y Priorización 
+      // Clasificación y Priorización
       {
         path: 'classification-prioritization',
-        loadChildren: () => import('./features/classification-prioritization/classification-prioritization.module').then(m => m.ClassificationPrioritizationModule),
+        loadChildren: () =>
+          import(
+            './features/classification-prioritization/classification-prioritization.module'
+          ).then((m) => m.ClassificationPrioritizationModule),
         //canActivate: [RoleGuard],
         title: 'Clasificación y Priorización - AyudAi',
         data: {
           roles: ['USER', 'ADMIN', 'MANAGER'],
           breadcrumb: 'Clasificación y Priorización',
           //permissions: ['view_transactions'] //habilitar cuando se tenga el sistema de permisos
-        }
+        },
       },
-      // Reportes y Auditoría 
+      // Reportes y Auditoría
       {
         path: 'reports-audit',
-        loadChildren: () => import('./features/reports-audit/reports-audit.module').then(m => m.ReportsAuditModule),
+        loadChildren: () =>
+          import('./features/reports-audit/reports-audit.module').then(
+            (m) => m.ReportsAuditModule
+          ),
         //canActivate: [RoleGuard],
         title: 'Reportes y Auditoría - AyudAi',
         data: {
           roles: ['USER', 'ADMIN', 'MANAGER'],
           breadcrumb: 'Reportes y Auditoría',
           //permissions: ['view_transactions'] //habilitar cuando se tenga el sistema de permisos
-        }
+        },
       },
       // // Cuentas - Usuarios y Admins
       // {
@@ -136,7 +146,7 @@ export const routes: Routes = [
       //     breadcrumb: 'Configuraciones'
       //   }
       // }
-    ]
+    ],
   },
   // Rutas de error y páginas especiales
   // {
@@ -170,16 +180,16 @@ export const routes: Routes = [
   // Redirección para rutas no encontradas
   {
     path: '**',
-    redirectTo: '/404'
-  }
+    redirectTo: '/404',
+  },
 ];
 
-
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {
-    preloadingStrategy: PreloadAllModules
-  })],
-  exports: [RouterModule]
+  imports: [
+    RouterModule.forRoot(routes, {
+      preloadingStrategy: PreloadAllModules,
+    }),
+  ],
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
-
+export class AppRoutingModule {}
