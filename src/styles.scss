@@ -99,9 +99,11 @@ body {
   height: 100%;
 }
 body {
-  margin: 0;
-  background: #eceef0;
-  font-family: var(--arial-narrow-regular), Roboto, sans-serif;
+  margin: 0px;
+  background-color: #f6fafd;
+  font-family: "Inter", sans-serif;
+  color: #1a202c;
+  min-height: 100vh;
 }
 
 @keyframes fadeInUp {
