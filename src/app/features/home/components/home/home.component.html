@@ -1,94 +1,102 @@
 <div class="home fade-in">
   <!-- Main Content -->
   <div class="main-content">
+    <!-- Estadísticas Generales -->
     <h2 class="section-title">
-      <i class="fas fa-car"></i>
-      Mis Créditos
+      <i class="fas fa-chart-bar"></i>
+      Estadísticas Generales
     </h2>
 
-    <div class="credit-cards">
+    <!-- Cards de Estadísticas -->
+    <div class="stats-grid">
       <div
-        *ngFor="let credit of credits; let i = index"
-        class="credit-card"
-        [class.collapsed]="!credit.isExpanded"
-        [style.background]="credit.isExpanded ? getCardGradient(i) : getCardCollapsedGradient(i)"
-        (click)="toggleCard(credit)">
-
-        <!-- Card Header -->
-        <div class="card-header">
-          <div class="card-number"># {{ credit.operation_id }}</div>
-          <i class="fas fa-car" style="font-size: 1.5rem;"></i>
-        </div>
-
-        <!-- Always visible content -->
-        <div class="card-amount">{{ credit.currency }} ${{ formatCurrency(credit.current_debt) }}</div>
-        <div style="font-size: 0.9rem; opacity: 0.9;">Deuda Actual</div>
-
-        <!-- <div class="expandable-content" *ngIf="credit.isExpanded"> -->
-          <!-- Progress bar -->
-          <div class="progress-container">
-            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
-              <span>Progreso del pago</span>
-              <span>{{ calculateProgress(credit.fees_paid, credit.total_fees) }}% completado</span>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill-red" [style.width.%]="calculateProgress(credit.fees_paid, credit.total_fees)"></div>
-            </div>
+        *ngFor="let stat of estadisticas"
+        class="stat-card"
+        [style.border-left-color]="stat.color"
+      >
+        <div class="stat-header">
+          <div
+            class="stat-icon"
+            [style.background-color]="stat.color + '20'"
+            [style.color]="stat.color"
+          >
+            <i [class]="'fas fa-' + stat.icono"></i>
           </div>
-
-        <!-- Expandable content -->
-        <div class="expandable-content" *ngIf="credit.isExpanded">
-          <!-- Card details -->
-          <div class="card-details">
-            <div class="card-detail">
-              <div class="card-detail-label">Próxima Cuota</div>
-              <div class="card-detail-value">${{ formatCurrency(credit.next_fee) }}</div>
-            </div>
-            <div class="card-detail">
-              <div class="card-detail-label">Cuotas Pagadas</div>
-              <div class="card-detail-value">{{ credit.fees_paid }} / {{ credit.total_fees }}</div>
-            </div>
-            <div class="card-detail">
-              <div class="card-detail-label">Vencimiento</div>
-              <div class="card-detail-value">{{ formatDate(credit.expiration_date) }}</div>
-            </div>
-            <div class="card-detail">
-              <div class="card-detail-label">Estado</div>
-              <div class="card-detail-value">
-                <span [ngClass]="{'status-paid': isPaidOff(credit), 'status-overdue': isOverdue(credit.expiration_date) && !isPaidOff(credit)}">
-                  {{ getStatusText(credit) }}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quick Actions for this specific card -->
-          <div class="card-actions">
-            <button *ngIf="isPaidOff(credit)" class="action-btn" (click)="$event.stopPropagation(); payInstallment(credit.operation_id)">
-              <i class="fas fa-credit-card"></i> Pagar Cuota
-            </button>
-            <button class="action-btn" (click)="$event.stopPropagation(); downloadContract(credit.operation_id)">
-              <i class="fas fa-download"></i> Descargar Contrato
-            </button>
-            <button class="action-btn" (click)="$event.stopPropagation(); viewSchedule(credit.operation_id)">
-              <i class="fas fa-calendar"></i> Descargar Cronograma
-            </button>
-            <button class="action-btn" (click)="$event.stopPropagation(); downloadAccountStatus(credit.operation_id)">
-              <i class="fas fa-download"></i> Estado de Cuenta
-            </button>
-            <button *ngIf="isPaidOff(credit)" class="action-btn" (click)="$event.stopPropagation(); downloadNoDebtLetter(credit.operation_id)">
-              <i class="fas fa-download"></i> Carta No Adeudo
-            </button>
-            <button *ngIf="isPaidOff(credit)" class="action-btn" (click)="$event.stopPropagation(); downloadNoDebtLetter(credit.operation_id)">
-              <i class="fas fa-download"></i> Levantamiento de Garantía
-            </button>
+          <div class="stat-info">
+            <h3 class="stat-title">{{ stat.titulo }}</h3>
+            <p class="stat-description">{{ stat.descripcion }}</p>
           </div>
         </div>
+        <div class="stat-body">
+          <div class="stat-value">{{ stat.valor }}</div>
+          <div class="stat-change" [style.color]="stat.color">
+            <i class="fas fa-arrow-up"></i>
+            {{ stat.cambio }}
+          </div>
+        </div>
+      </div>
+    </div>
 
-        <!-- Collapse indicator -->
-        <div class="collapse-indicator" *ngIf="!credit.isExpanded">
-          <i class="fas fa-chevron-down"></i>
-          <span>Toca para ver detalles</span>
+    <!-- Acciones Rápidas -->
+    <h2 class="section-title" style="margin-top: 2rem">
+      <i class="fas fa-bolt"></i>
+      Acciones Rápidas
+    </h2>
+
+    <div class="quick-actions">
+      <button
+        class="action-btn action-primary"
+        (click)="registrarNuevoBeneficiario()"
+      >
+        <i class="fas fa-user-plus"></i>
+        <span>Registrar Beneficiario</span>
+      </button>
+      <button
+        class="action-btn action-secondary"
+        (click)="buscarBeneficiario()"
+      >
+        <i class="fas fa-search"></i>
+        <span>Buscar Beneficiario</span>
+      </button>
+      <button class="action-btn action-secondary" (click)="verReportes()">
+        <i class="fas fa-chart-line"></i>
+        <span>Ver Reportes</span>
+      </button>
+      <button class="action-btn action-secondary" (click)="exportarDatos()">
+        <i class="fas fa-file-export"></i>
+        <span>Exportar Datos</span>
+      </button>
+    </div>
+
+    <!-- Actividad Reciente -->
+    <h2 class="section-title" style="margin-top: 2rem">
+      <i class="fas fa-clock"></i>
+      Actividad Reciente
+    </h2>
+
+    <div class="activity-list">
+      <div
+        *ngFor="let actividad of actividadReciente"
+        class="activity-item"
+        (click)="verDetalleBeneficiario(actividad.id)"
+      >
+        <div class="activity-icon">
+          <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="activity-content">
+          <h4 class="activity-name">{{ actividad.nombreCompleto }}</h4>
+          <p class="activity-details">
+            <span class="badge badge-info">{{
+              actividad.tipoDiscapacidad
+            }}</span>
+            <span class="activity-separator">•</span>
+            <span class="activity-registrador"
+              >Registrado por: {{ actividad.registrador }}</span
+            >
+          </p>
+        </div>
+        <div class="activity-time">
+          {{ formatearTiempoTranscurrido(actividad.fechaRegistro) }}
         </div>
       </div>
     </div>
@@ -96,30 +104,59 @@
 
   <!-- Sidebar -->
   <aside class="sidebar">
-    <!-- NEWS Widget -->
-    <app-card-slider></app-card-slider>
-
-    <!-- Social Media Widget -->
-    <app-card-social> </app-card-social>
-
-    <!-- Quick Stats -->
+    <!-- Widget de Resumen -->
     <div class="widget">
       <h3 class="widget-title">
-        <i class="fas fa-chart-line"></i>
-        Resumen
+        <i class="fas fa-info-circle"></i>
+        Resumen del Sistema
       </h3>
-      <div style="display: flex; flex-direction: column; gap: 15px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="color: #666;">Total Deuda</span>
-          <strong style="color: #e53e3e;">$28,029.44</strong>
+      <div class="widget-content">
+        <div class="summary-item">
+          <span class="summary-label">Total Beneficiarios</span>
+          <strong class="summary-value" style="color: #2563eb">1,247</strong>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="color: #666;">Próximos Pagos</span>
-          <strong style="color: #38a169;">$2,443.86</strong>
+        <div class="summary-item">
+          <span class="summary-label">Registros Pendientes</span>
+          <strong class="summary-value" style="color: #f59e0b">8</strong>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="color: #666;">Créditos Activos</span>
-          <strong style="color: #667eea;">2</strong>
+        <div class="summary-item">
+          <span class="summary-label">Completados Hoy</span>
+          <strong class="summary-value" style="color: #10b981">23</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Widget de Ayuda -->
+    <div class="widget">
+      <h3 class="widget-title">
+        <i class="fas fa-question-circle"></i>
+        ¿Necesitas Ayuda?
+      </h3>
+      <div class="widget-content">
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem">
+          Consulta nuestra guía rápida para registrar beneficiarios
+        </p>
+        <button class="help-btn">
+          <i class="fas fa-book"></i>
+          Ver Guía
+        </button>
+      </div>
+    </div>
+
+    <!-- Widget de Información -->
+    <div class="widget">
+      <h3 class="widget-title">
+        <i class="fas fa-bell"></i>
+        Notificaciones
+      </h3>
+      <div class="widget-content">
+        <div class="notification-item">
+          <i class="fas fa-exclamation-circle" style="color: #f59e0b"></i>
+          <p>8 registros pendientes de validación</p>
+        </div>
+        <div class="notification-item">
+          <i class="fas fa-check-circle" style="color: #10b981"></i>
+          <p>Sistema actualizado correctamente</p>
         </div>
       </div>
     </div>
