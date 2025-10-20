@@ -1,0 +1,280 @@
+// Variables
+$primary-color: #2563eb;
+$primary-hover: #1d4ed8;
+$secondary-color: #6b7280;
+$border-color: #d1d5db;
+$error-color: #dc2626;
+$background-gray: #f3f4f6;
+$white: #ffffff;
+
+// Reset base
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: $background-gray;
+}
+
+// Main Content
+.main-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+// Title Card
+.title-card {
+  background-color: $white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border-left: 4px solid $primary-color;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    color: $secondary-color;
+    margin: 0;
+    font-size: 0.875rem;
+  }
+}
+
+// Form Card
+.form-card {
+  background-color: $white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+}
+
+// Form Section
+.form-section {
+  margin-bottom: 2rem;
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid $primary-color;
+
+    svg {
+      color: $primary-color;
+      flex-shrink: 0;
+    }
+
+    h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: $primary-color;
+      margin: 0;
+    }
+  }
+}
+
+// Form Grid
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+// Form Field
+.form-field {
+  display: flex;
+  flex-direction: column;
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+
+    .required {
+      color: $error-color;
+    }
+  }
+
+  input[type="text"],
+  input[type="tel"],
+  input[type="date"],
+  input[type="email"],
+  input[type="number"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid $border-color;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    outline: none;
+
+    &:focus {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+    }
+
+    &.invalid {
+      border-color: $error-color;
+    }
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+  }
+
+  // Input with icon
+  .input-with-icon {
+    position: relative;
+
+    input {
+      padding-right: 2.5rem;
+    }
+
+    .input-icon {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      pointer-events: none;
+    }
+  }
+
+  // Select wrapper
+  .select-wrapper {
+    position: relative;
+
+    select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      padding-right: 2.5rem;
+      border: 1px solid $border-color;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      background-color: $white;
+      cursor: pointer;
+      appearance: none;
+      outline: none;
+      transition: all 0.3s ease;
+
+      &:focus {
+        border-color: $primary-color;
+        box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+      }
+
+      &.invalid {
+        border-color: $error-color;
+      }
+    }
+
+    .select-icon {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      pointer-events: none;
+    }
+  }
+
+  // Error message
+  .error-message {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: $error-color;
+
+    span {
+      display: block;
+    }
+  }
+}
+
+// Form Actions
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid $border-color;
+  margin-top: 1.5rem;
+}
+
+// Buttons
+.btn-primary,
+.btn-secondary {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-primary {
+  background-color: $primary-color;
+  color: $white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background-color: $primary-hover;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #374151;
+  border: 1px solid $border-color;
+
+  &:hover {
+    background-color: $background-gray;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-card {
+    padding: 1.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}
