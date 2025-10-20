@@ -16,32 +16,21 @@ import {
 })
 export class BeneficiaryRegistrationComponent implements OnInit {
   beneficiaryForm!: FormGroup;
+  currentStep: number = 1;
+  totalSteps: number = 6; // 6 pasos, apoderado va en paso 2
 
-  // Control de secciones expandidas
-  expandedSections = {
-    datosPersonales: true,
-    domicilio: true,
-    discapacidad: true,
-    salud: false,
-    educacionTrabajo: false,
-    vivienda: false,
-    apoderado: false,
-  };
-
-  // Catálogos - Datos Personales
+  // Catálogos según BD - Estos vendrán del backend
   tiposDocumento = [
     { codigo: 'DNI', nombre: 'DNI' },
     { codigo: 'CE', nombre: 'Carnet de Extranjería' },
     { codigo: 'PASAPORTE', nombre: 'Pasaporte' },
-    { codigo: 'OTRO', nombre: 'Otro' },
   ];
 
   nacionalidades = [
     { id: 1, nombre: 'Peruana' },
     { id: 2, nombre: 'Venezolana' },
     { id: 3, nombre: 'Colombiana' },
-    { id: 4, nombre: 'Ecuatoriana' },
-    { id: 5, nombre: 'Otra' },
+    { id: 4, nombre: 'Otra' },
   ];
 
   generos = [
@@ -58,17 +47,14 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     { id: 5, nombre: 'Conviviente' },
   ];
 
-  // Catálogos - Ubicación (estos deberían venir del backend)
   departamentos = [
-    { id: 1, nombre: 'Lima' },
-    { id: 2, nombre: 'Piura' },
-    { id: 3, nombre: 'Arequipa' },
+    { id: 1, nombre: 'Lima', codigo: '15' },
+    { id: 2, nombre: 'Piura', codigo: '20' },
   ];
 
   provincias: any[] = [];
   distritos: any[] = [];
 
-  // Catálogos - Discapacidad
   gradosDiscapacidad = [
     { id: 1, nombre: 'Leve' },
     { id: 2, nombre: 'Moderado' },
@@ -101,10 +87,8 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     { id: 4, nombre: 'Prótesis' },
     { id: 5, nombre: 'Audífono' },
     { id: 6, nombre: 'Ninguna' },
-    { id: 7, nombre: 'Otra' },
   ];
 
-  // Catálogos - Educación y Trabajo
   gradosInstruccion = [
     { id: 1, nombre: 'Sin estudios' },
     { id: 2, nombre: 'Primaria incompleta' },
@@ -132,10 +116,8 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     { id: 3, nombre: 'Atletismo' },
     { id: 4, nombre: 'Básquet' },
     { id: 5, nombre: 'Ninguna' },
-    { id: 6, nombre: 'Otra' },
   ];
 
-  // Catálogos - Vivienda
   condicionesVivienda = [
     { id: 1, nombre: 'Propia' },
     { id: 2, nombre: 'Alquilada' },
@@ -148,7 +130,6 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     { id: 2, nombre: 'Departamento' },
     { id: 3, nombre: 'Cuarto' },
     { id: 4, nombre: 'Vivienda precaria' },
-    { id: 5, nombre: 'Otra' },
   ];
 
   serviciosBasicos = [
@@ -165,7 +146,6 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     { id: 3, descripcion: 'Con pareja' },
     { id: 4, descripcion: 'Con hijos' },
     { id: 5, descripcion: 'Con familiares' },
-    { id: 6, descripcion: 'Otro' },
   ];
 
   tiposSeguros = [
@@ -183,8 +163,7 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     { id: 5, nombre: 'Ninguno' },
   ];
 
-  // Catálogos - Apoderado
-  tiposParentesco = [
+  parentescos = [
     { id: 1, nombre: 'Padre' },
     { id: 2, nombre: 'Madre' },
     { id: 3, nombre: 'Hermano(a)' },
@@ -194,6 +173,9 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     { id: 7, nombre: 'Otro' },
   ];
 
+  selectedServiciosBasicos: number[] = [];
+  mostrarApoderado: boolean = false; // Control para mostrar/ocultar sección apoderado
+
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
@@ -202,235 +184,215 @@ export class BeneficiaryRegistrationComponent implements OnInit {
 
   initializeForm(): void {
     this.beneficiaryForm = this.fb.group({
-      // 🟦 DATOS PERSONALES
-      nombresCompletos: ['', [Validators.required, Validators.minLength(3)]],
-      edadTexto: [''],
-      tipoDocumentoCodigo: ['DNI', Validators.required],
-      numeroDocumento: ['', [Validators.required, Validators.minLength(6)]],
-      idNacionalidad: ['', Validators.required],
-      nacionalidadOtro: [''],
+      // 🟦 PASO 1: IDENTIDAD Y DATOS BÁSICOS
+      nombres_completos: ['', [Validators.required, Validators.minLength(3)]],
+      edad_texto: [''],
+      tipo_documento_codigo: ['DNI', Validators.required],
+      numero_documento: ['', [Validators.required, Validators.minLength(6)]],
+      id_nacionalidad: ['', Validators.required],
+      nacionalidad_otro: [''],
       sexo: ['', Validators.required],
-      fechaNacimiento: ['', Validators.required],
-
-      // 🟦 DOMICILIO Y UBICACIÓN
-      idDepartamento: ['', Validators.required],
-      idProvincia: ['', Validators.required],
-      idDistrito: ['', Validators.required],
-      idEstadoCivil: ['', Validators.required],
-      tieneHijos: [false],
-      numeroHijos: [0],
-      direccionActual: [''],
-      referencia: [''],
+      fecha_nacimiento: ['', Validators.required],
       telefono: ['', Validators.pattern(/^9[0-9]{8}$/)],
+      correo_electronico: ['', Validators.email],
 
-      // 🟦 DISCAPACIDAD
-      tieneCarnetConadis: [false, Validators.required],
-      numeroCarnetConadis: [''],
-      tieneCertificadoDiscapacidad: [false, Validators.required],
-      idGradoDiscapacidad: [''],
-      idTipoDiscapacidad: [''],
-      discapacidadOtro: [''],
+      // 🟦 PASO 2: UBIGEO Y DOMICILIO
+      id_departamento: ['', Validators.required],
+      id_provincia: ['', Validators.required],
+      id_distrito: ['', Validators.required],
+      id_estado_civil: ['', Validators.required],
+      tiene_hijos: [false],
+      numero_hijos: [null],
+      direccion_actual: [''],
+      referencia: [''],
+
+      // 🟦 PASO 3: DISCAPACIDAD
+      tiene_carnet_conadis: [false, Validators.required],
+      numero_carnet_conadis: [''],
+      tiene_certificado_discapacidad: [false, Validators.required],
+      id_grado_discapacidad: [null],
+      id_tipo_discapacidad: [null],
+      discapacidad_otro: [''],
       cie10: [''],
-      idCausaDiscapacidad: [''],
-      idAyudaBiomecanica: [''],
+      id_causa_discapacidad: [null],
+      id_ayuda_biomecanica: [null],
 
-      // 🟦 SALUD
-      recibeAtencionMedica: [false],
-      tomaMedicamentos: [false],
+      // 🟦 PASO 4: SALUD Y TRATAMIENTO
+      recibe_atencion_medica: [false],
+      toma_medicamentos: [false],
       tratamiento: [''],
-      otrasPersonasDiscapacidad: [false],
-      cuantasPersonasDiscapacidad: [0],
+      otras_personas_discapacidad: [false],
+      cuantas_personas_discapacidad: [null],
+      id_seguro: [null],
 
-      // 🟦 EDUCACIÓN Y TRABAJO
-      laboraActualmente: [false],
-      lugarTrabajo: [''],
-      funcionDesempena: [''],
-      idGradoInstruccion: [''],
-      centroEstudios: [''],
+      // 🟦 PASO 5: EDUCACIÓN Y TRABAJO
+      labora_actualmente: [false],
+      lugar_trabajo: [''],
+      funcion_desempena: [''],
+      id_grado_instruccion: [null],
+      centro_estudios: [''],
       carrera: [''],
       idiomas: [''],
-      recibioTestVocacional: [false],
-      testVocacionalDonde: [''],
-      idTipoApoyo: [''],
-      idActividadDeportiva: [''],
+      id_tipo_apoyo: [null],
+      id_actividad_deportiva: [null],
+      recibio_test_vocacional: [false],
+      test_vocacional_donde: [''],
 
-      // 🟦 VIVIENDA Y CONVIVENCIA
-      idCondicionVivienda: [''],
-      idTipoVivienda: [''],
-      serviciosBasicos: [[]],
-      idConQuienVive: [''],
-      idSeguro: [''],
-      idProgramaSocial: [''],
+      // 🟦 PASO 6: VIVIENDA Y CONVIVENCIA
+      id_condicion_vivienda: [null],
+      id_tipo_vivienda: [null],
+      id_con_quien_vive: [null],
+      id_programa_social: [null],
 
-      // 🟦 CONTACTO Y REGISTRO
-      correoElectronico: ['', Validators.email],
-      estaRegistradoOmaped: [true],
-      nombresRegistrador: ['', Validators.required],
+      // 🟦 APODERADO (opcional - va en Paso 2)
+      apoderado_nombres: [''],
+      apoderado_id_parentesco: [null],
+      apoderado_tipo_documento: ['DNI'],
+      apoderado_numero_documento: [''],
+      apoderado_telefono: [''],
+      apoderado_direccion: [''],
 
-      // 🟦 APODERADO (opcional)
-      apoderado: this.fb.group({
-        nombres: [''],
-        idParentesco: [''],
-        tipoDocumentoCodigo: [''],
-        numeroDocumento: [''],
-        telefono: [''],
-        direccion: [''],
-      }),
+      // Datos institucionales (Paso 6)
+      esta_registrado_omaped: [true],
+      nombres_registrador: ['', Validators.required],
     });
 
-    // Listeners para campos condicionales
-    this.setupConditionalFields();
+    this.setupConditionalValidators();
   }
 
-  setupConditionalFields(): void {
-    // Si tiene hijos, número de hijos es requerido
-    this.beneficiaryForm.get('tieneHijos')?.valueChanges.subscribe((value) => {
-      const numeroHijosControl = this.beneficiaryForm.get('numeroHijos');
+  setupConditionalValidators(): void {
+    // Si tiene hijos, el número es requerido
+    this.beneficiaryForm.get('tiene_hijos')?.valueChanges.subscribe((value) => {
+      const control = this.beneficiaryForm.get('numero_hijos');
       if (value) {
-        numeroHijosControl?.setValidators([
-          Validators.required,
-          Validators.min(1),
-        ]);
+        control?.setValidators([Validators.required, Validators.min(1)]);
       } else {
-        numeroHijosControl?.clearValidators();
-        numeroHijosControl?.setValue(0);
+        control?.clearValidators();
+        control?.setValue(null);
       }
-      numeroHijosControl?.updateValueAndValidity();
+      control?.updateValueAndValidity();
     });
 
     // Si tiene carnet CONADIS, el número es requerido
     this.beneficiaryForm
-      .get('tieneCarnetConadis')
+      .get('tiene_carnet_conadis')
       ?.valueChanges.subscribe((value) => {
-        const numeroCarnetControl = this.beneficiaryForm.get(
-          'numeroCarnetConadis'
-        );
+        const control = this.beneficiaryForm.get('numero_carnet_conadis');
         if (value) {
-          numeroCarnetControl?.setValidators(Validators.required);
+          control?.setValidators(Validators.required);
         } else {
-          numeroCarnetControl?.clearValidators();
+          control?.clearValidators();
+          control?.setValue('');
         }
-        numeroCarnetControl?.updateValueAndValidity();
+        control?.updateValueAndValidity();
       });
 
     // Si nacionalidad es "Otra", el campo otro es requerido
     this.beneficiaryForm
-      .get('idNacionalidad')
+      .get('id_nacionalidad')
       ?.valueChanges.subscribe((value) => {
-        const otroControl = this.beneficiaryForm.get('nacionalidadOtro');
-        if (value === 5) {
-          // 5 = Otra
-          otroControl?.setValidators(Validators.required);
+        const control = this.beneficiaryForm.get('nacionalidad_otro');
+        if (value === 4) {
+          control?.setValidators(Validators.required);
         } else {
-          otroControl?.clearValidators();
+          control?.clearValidators();
+          control?.setValue('');
         }
-        otroControl?.updateValueAndValidity();
+        control?.updateValueAndValidity();
       });
+
+    // Si labora, lugar y función son requeridos
+    this.beneficiaryForm
+      .get('labora_actualmente')
+      ?.valueChanges.subscribe((value) => {
+        const lugarControl = this.beneficiaryForm.get('lugar_trabajo');
+        const funcionControl = this.beneficiaryForm.get('funcion_desempena');
+        if (value) {
+          lugarControl?.setValidators(Validators.required);
+          funcionControl?.setValidators(Validators.required);
+        } else {
+          lugarControl?.clearValidators();
+          funcionControl?.clearValidators();
+        }
+        lugarControl?.updateValueAndValidity();
+        funcionControl?.updateValueAndValidity();
+      });
+
+    // Si marca que necesita apoderado, validar campos del apoderado
+    // Esta lógica se puede agregar si se necesita
   }
 
-  toggleSection(section: keyof typeof this.expandedSections): void {
-    this.expandedSections[section] = !this.expandedSections[section];
+  toggleApoderado(): void {
+    this.mostrarApoderado = !this.mostrarApoderado;
+  }
+
+  nextStep(): void {
+    if (this.currentStep < this.totalSteps) {
+      this.currentStep++;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  previousStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  goToStep(step: number): void {
+    if (step >= 1 && step <= this.totalSteps) {
+      this.currentStep = step;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  isStepCompleted(step: number): boolean {
+    return step < this.currentStep;
   }
 
   onSubmit(): void {
     if (this.beneficiaryForm.valid) {
-      const formData = this.prepareDataForBackend();
-      console.log('Datos para enviar al backend:', formData);
-      // Aquí llamarías al servicio: this.beneficiaryService.create(formData)
+      const dataToSend = {
+        beneficiario: this.beneficiaryForm.value,
+        servicios_basicos: this.selectedServiciosBasicos,
+        apoderado: this.prepareApoderadoData(),
+      };
+      console.log('✅ Datos para enviar al backend:', dataToSend);
+      alert('Formulario enviado correctamente. Revisa la consola.');
+      // Aquí irá la llamada al servicio
+      // this.beneficiaryService.create(dataToSend).subscribe(...)
     } else {
-      console.log('Formulario inválido');
-      this.markFormGroupTouched(this.beneficiaryForm);
-      this.expandInvalidSections();
+      console.log('❌ Formulario inválido');
+      this.markAllAsTouched();
+      alert('Por favor complete todos los campos requeridos');
     }
   }
 
-  prepareDataForBackend(): any {
-    const formValue = this.beneficiaryForm.value;
-
-    // Estructura lista para enviar al backend (coincide con la BD)
-    return {
-      beneficiario: {
-        nombres_completos: formValue.nombresCompletos,
-        edad_texto: formValue.edadTexto,
-        tipo_documento_codigo: formValue.tipoDocumentoCodigo,
-        numero_documento: formValue.numeroDocumento,
-        id_nacionalidad: formValue.idNacionalidad,
-        nacionalidad_otro: formValue.nacionalidadOtro,
-        sexo: formValue.sexo,
-        fecha_nacimiento: formValue.fechaNacimiento,
-        id_departamento: formValue.idDepartamento,
-        id_provincia: formValue.idProvincia,
-        id_distrito: formValue.idDistrito,
-        id_estado_civil: formValue.idEstadoCivil,
-        tiene_hijos: formValue.tieneHijos,
-        numero_hijos: formValue.numeroHijos,
-        direccion_actual: formValue.direccionActual,
-        referencia: formValue.referencia,
-        telefono: formValue.telefono,
-        tiene_carnet_conadis: formValue.tieneCarnetConadis,
-        numero_carnet_conadis: formValue.numeroCarnetConadis,
-        tiene_certificado_discapacidad: formValue.tieneCertificadoDiscapacidad,
-        id_grado_discapacidad: formValue.idGradoDiscapacidad,
-        id_tipo_discapacidad: formValue.idTipoDiscapacidad,
-        discapacidad_otro: formValue.discapacidadOtro,
-        cie10: formValue.cie10,
-        id_causa_discapacidad: formValue.idCausaDiscapacidad,
-        recibe_atencion_medica: formValue.recibeAtencionMedica,
-        toma_medicamentos: formValue.tomaMedicamentos,
-        tratamiento: formValue.tratamiento,
-        otras_personas_discapacidad: formValue.otrasPersonasDiscapacidad,
-        cuantas_personas_discapacidad: formValue.cuantasPersonasDiscapacidad,
-        id_ayuda_biomecanica: formValue.idAyudaBiomecanica,
-        recibio_test_vocacional: formValue.recibioTestVocacional,
-        test_vocacional_donde: formValue.testVocacionalDonde,
-        labora_actualmente: formValue.laboraActualmente,
-        lugar_trabajo: formValue.lugarTrabajo,
-        funcion_desempena: formValue.funcionDesempena,
-        id_grado_instruccion: formValue.idGradoInstruccion,
-        centro_estudios: formValue.centroEstudios,
-        carrera: formValue.carrera,
-        idiomas: formValue.idiomas,
-        id_tipo_apoyo: formValue.idTipoApoyo,
-        id_actividad_deportiva: formValue.idActividadDeportiva,
-        id_condicion_vivienda: formValue.idCondicionVivienda,
-        id_tipo_vivienda: formValue.idTipoVivienda,
-        id_con_quien_vive: formValue.idConQuienVive,
-        id_seguro: formValue.idSeguro,
-        id_programa_social: formValue.idProgramaSocial,
-        correo_electronico: formValue.correoElectronico,
-        esta_registrado_omaped: formValue.estaRegistradoOmaped,
-        nombres_registrador: formValue.nombresRegistrador,
-      },
-      servicios_basicos: formValue.serviciosBasicos,
-      apoderado: formValue.apoderado.nombres ? formValue.apoderado : null,
-    };
+  prepareApoderadoData(): any {
+    const form = this.beneficiaryForm.value;
+    if (form.apoderado_nombres) {
+      return {
+        nombres: form.apoderado_nombres,
+        id_parentesco: form.apoderado_id_parentesco,
+        tipo_documento_codigo: form.apoderado_tipo_documento,
+        numero_documento: form.apoderado_numero_documento,
+        telefono: form.apoderado_telefono,
+        direccion: form.apoderado_direccion,
+      };
+    }
+    return null;
   }
 
-  expandInvalidSections(): void {
-    // Expandir secciones con errores
-    const controls = this.beneficiaryForm.controls;
-    if (
-      this.hasErrorsInSection([
-        'nombresCompletos',
-        'numeroDocumento',
-        'sexo',
-        'fechaNacimiento',
-      ])
-    ) {
-      this.expandedSections.datosPersonales = true;
+  onServicioBasicoChange(event: any, idServicio: number): void {
+    if (event.target.checked) {
+      this.selectedServiciosBasicos.push(idServicio);
+    } else {
+      const index = this.selectedServiciosBasicos.indexOf(idServicio);
+      if (index > -1) {
+        this.selectedServiciosBasicos.splice(index, 1);
+      }
     }
-    if (
-      this.hasErrorsInSection(['idDepartamento', 'idProvincia', 'idDistrito'])
-    ) {
-      this.expandedSections.domicilio = true;
-    }
-  }
-
-  hasErrorsInSection(fields: string[]): boolean {
-    return fields.some((field) => {
-      const control = this.beneficiaryForm.get(field);
-      return control && control.invalid && control.touched;
-    });
   }
 
   onCancel(): void {
@@ -439,30 +401,38 @@ export class BeneficiaryRegistrationComponent implements OnInit {
         '¿Está seguro de cancelar? Se perderán todos los datos ingresados.'
       )
     ) {
-      this.beneficiaryForm.reset();
-      this.expandedSections.datosPersonales = true;
+      this.beneficiaryForm.reset({
+        tipo_documento_codigo: 'DNI',
+        tiene_hijos: false,
+        tiene_carnet_conadis: false,
+        tiene_certificado_discapacidad: false,
+        recibe_atencion_medica: false,
+        toma_medicamentos: false,
+        otras_personas_discapacidad: false,
+        labora_actualmente: false,
+        recibio_test_vocacional: false,
+        esta_registrado_omaped: true,
+      });
+      this.currentStep = 1;
     }
   }
 
-  private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.keys(formGroup.controls).forEach((key) => {
-      const control = formGroup.get(key);
+  private markAllAsTouched(): void {
+    Object.keys(this.beneficiaryForm.controls).forEach((key) => {
+      const control = this.beneficiaryForm.get(key);
       control?.markAsTouched();
-      if (control instanceof FormGroup) {
-        this.markFormGroupTouched(control);
-      }
     });
   }
 
   // Getters para validaciones
-  get nombresCompletos() {
-    return this.beneficiaryForm.get('nombresCompletos');
+  get nombres_completos() {
+    return this.beneficiaryForm.get('nombres_completos');
   }
-  get numeroDocumento() {
-    return this.beneficiaryForm.get('numeroDocumento');
+  get numero_documento() {
+    return this.beneficiaryForm.get('numero_documento');
   }
-  get fechaNacimiento() {
-    return this.beneficiaryForm.get('fechaNacimiento');
+  get fecha_nacimiento() {
+    return this.beneficiaryForm.get('fecha_nacimiento');
   }
   get sexo() {
     return this.beneficiaryForm.get('sexo');
@@ -470,19 +440,19 @@ export class BeneficiaryRegistrationComponent implements OnInit {
   get telefono() {
     return this.beneficiaryForm.get('telefono');
   }
-  get correoElectronico() {
-    return this.beneficiaryForm.get('correoElectronico');
+  get correo_electronico() {
+    return this.beneficiaryForm.get('correo_electronico');
   }
-  get idDepartamento() {
-    return this.beneficiaryForm.get('idDepartamento');
+  get id_departamento() {
+    return this.beneficiaryForm.get('id_departamento');
   }
-  get idProvincia() {
-    return this.beneficiaryForm.get('idProvincia');
+  get id_provincia() {
+    return this.beneficiaryForm.get('id_provincia');
   }
-  get idDistrito() {
-    return this.beneficiaryForm.get('idDistrito');
+  get id_distrito() {
+    return this.beneficiaryForm.get('id_distrito');
   }
-  get nombresRegistrador() {
-    return this.beneficiaryForm.get('nombresRegistrador');
+  get nombres_registrador() {
+    return this.beneficiaryForm.get('nombres_registrador');
   }
 }

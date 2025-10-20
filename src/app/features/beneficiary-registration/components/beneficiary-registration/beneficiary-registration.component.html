@@ -9,284 +9,1292 @@
     </p>
   </div>
 
+  <!-- Stepper Progress -->
+  <div class="stepper-container">
+    <div class="stepper">
+      <div
+        class="step-item"
+        *ngFor="let step of [1, 2, 3, 4, 5, 6]"
+        [class.active]="currentStep === step"
+        [class.completed]="isStepCompleted(step)"
+        (click)="goToStep(step)"
+      >
+        <div class="step-number">
+          <span *ngIf="!isStepCompleted(step)">{{ step }}</span>
+          <svg
+            *ngIf="isStepCompleted(step)"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          >
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div class="step-label">
+          {{
+            step === 1
+              ? "Identidad"
+              : step === 2
+              ? "Domicilio"
+              : step === 3
+              ? "Discapacidad"
+              : step === 4
+              ? "Salud"
+              : step === 5
+              ? "Educación"
+              : "Vivienda"
+          }}
+        </div>
+        <div class="step-line" *ngIf="step < 6"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Form -->
   <form [formGroup]="beneficiaryForm" (ngSubmit)="onSubmit()" class="form-card">
     <!-- ============================================ -->
-    <!-- SECCIÓN 1: DATOS PERSONALES -->
+    <!-- PASO 1: IDENTIDAD Y DATOS BÁSICOS -->
     <!-- ============================================ -->
-    <section
-      class="form-section"
-      [class.collapsed]="!expandedSections.datosPersonales"
-    >
-      <div class="section-header" (click)="toggleSection('datosPersonales')">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        <h3>Datos Personales</h3>
-        <svg
-          class="chevron"
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
+    <div class="step-content" *ngIf="currentStep === 1">
+      <div class="step-header">
+        <h3>Identidad y Datos Básicos</h3>
       </div>
 
-      <div class="section-content" *ngIf="expandedSections.datosPersonales">
-        <div class="form-grid">
-          <!-- Nombres Completos -->
-          <div class="form-field full-width">
-            <label for="nombresCompletos">
-              Nombres Completos <span class="required">*</span>
-            </label>
-            <input
-              type="text"
-              id="nombresCompletos"
-              formControlName="nombresCompletos"
-              placeholder="Ingrese nombres y apellidos completos"
-              [class.invalid]="
-                nombresCompletos?.invalid && nombresCompletos?.touched
-              "
-            />
-            <div
-              class="error-message"
-              *ngIf="nombresCompletos?.invalid && nombresCompletos?.touched"
-            >
-              <span *ngIf="nombresCompletos?.errors?.['required']"
-                >El nombre completo es obligatorio</span
-              >
-              <span *ngIf="nombresCompletos?.errors?.['minlength']"
-                >Mínimo 3 caracteres</span
-              >
-            </div>
-          </div>
-
-          <!-- Tipo de Documento -->
-          <div class="form-field">
-            <label for="tipoDocumento">
-              Tipo de Documento <span class="required">*</span>
-            </label>
-            <div class="select-wrapper">
-              <select id="tipoDocumento" formControlName="tipoDocumentoCodigo">
-                <option
-                  *ngFor="let tipo of tiposDocumento"
-                  [value]="tipo.codigo"
-                >
-                  {{ tipo.nombre }}
-                </option>
-              </select>
-              <svg
-                class="select-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
-          </div>
-
-          <!-- Número de Documento -->
-          <div class="form-field">
-            <label for="numeroDocumento">
-              Número de Documento <span class="required">*</span>
-            </label>
-            <input
-              type="text"
-              id="numeroDocumento"
-              formControlName="numeroDocumento"
-              placeholder="Ej: 12345678"
-              [class.invalid]="
-                numeroDocumento?.invalid && numeroDocumento?.touched
-              "
-            />
-            <div
-              class="error-message"
-              *ngIf="numeroDocumento?.invalid && numeroDocumento?.touched"
-            >
-              <span *ngIf="numeroDocumento?.errors?.['required']"
-                >El número de documento es obligatorio</span
-              >
-              <span *ngIf="numeroDocumento?.errors?.['minlength']"
-                >Mínimo 6 caracteres</span
-              >
-            </div>
-          </div>
-
-          <!-- Nacionalidad -->
-          <div class="form-field">
-            <label for="nacionalidad">
-              Nacionalidad <span class="required">*</span>
-            </label>
-            <div class="select-wrapper">
-              <select id="nacionalidad" formControlName="idNacionalidad">
-                <option value="">Seleccione nacionalidad</option>
-                <option *ngFor="let nac of nacionalidades" [value]="nac.id">
-                  {{ nac.nombre }}
-                </option>
-              </select>
-              <svg
-                class="select-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
-          </div>
-
-          <!-- Otra Nacionalidad (condicional) -->
+      <div class="form-grid">
+        <!-- Nombres Completos -->
+        <div class="form-field full-width">
+          <label for="nombres_completos">
+            Nombres Completos <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="nombres_completos"
+            formControlName="nombres_completos"
+            placeholder="Ingrese nombres y apellidos completos"
+            [class.invalid]="
+              nombres_completos?.invalid && nombres_completos?.touched
+            "
+          />
           <div
-            class="form-field"
-            *ngIf="beneficiaryForm.get('idNacionalidad')?.value === 5"
+            class="error-message"
+            *ngIf="nombres_completos?.invalid && nombres_completos?.touched"
           >
-            <label for="nacionalidadOtro">
-              Especifique Nacionalidad <span class="required">*</span>
-            </label>
-            <input
-              type="text"
-              id="nacionalidadOtro"
-              formControlName="nacionalidadOtro"
-              placeholder="Especifique la nacionalidad"
-            />
+            <span>El nombre completo es obligatorio (mínimo 3 caracteres)</span>
           </div>
+        </div>
 
-          <!-- Sexo -->
-          <div class="form-field">
-            <label for="sexo"> Sexo <span class="required">*</span> </label>
-            <div class="select-wrapper">
-              <select
-                id="sexo"
-                formControlName="sexo"
-                [class.invalid]="sexo?.invalid && sexo?.touched"
-              >
-                <option value="">Seleccione sexo</option>
-                <option *ngFor="let gen of generos" [value]="gen.value">
-                  {{ gen.label }}
-                </option>
-              </select>
-              <svg
-                class="select-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
-          </div>
-
-          <!-- Fecha de Nacimiento -->
-          <div class="form-field">
-            <label for="fechaNacimiento">
-              Fecha de Nacimiento <span class="required">*</span>
-            </label>
-            <input
-              type="date"
-              id="fechaNacimiento"
-              formControlName="fechaNacimiento"
-              [class.invalid]="
-                fechaNacimiento?.invalid && fechaNacimiento?.touched
-              "
-            />
-          </div>
-
-          <!-- Edad (texto manual - opcional) -->
-          <div class="form-field">
-            <label for="edadTexto">Edad (opcional)</label>
-            <input
-              type="text"
-              id="edadTexto"
-              formControlName="edadTexto"
-              placeholder="Ej: 25 años"
-              maxlength="5"
-            />
-          </div>
-
-          <!-- Estado Civil -->
-          <div class="form-field">
-            <label for="estadoCivil">
-              Estado Civil <span class="required">*</span>
-            </label>
-            <div class="select-wrapper">
-              <select id="estadoCivil" formControlName="idEstadoCivil">
-                <option value="">Seleccione estado civil</option>
-                <option
-                  *ngFor="let estado of estadosCiviles"
-                  [value]="estado.id"
-                >
-                  {{ estado.nombre }}
-                </option>
-              </select>
-              <svg
-                class="select-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
-          </div>
-
-          <!-- Teléfono -->
-          <div class="form-field">
-            <label for="telefono">Teléfono</label>
-            <input
-              type="tel"
-              id="telefono"
-              formControlName="telefono"
-              placeholder="987654321"
-              maxlength="9"
-              [class.invalid]="telefono?.invalid && telefono?.touched"
-            />
-            <div
-              class="error-message"
-              *ngIf="telefono?.invalid && telefono?.touched"
+        <!-- Tipo de Documento -->
+        <div class="form-field">
+          <label for="tipo_documento_codigo"
+            >Tipo de Documento <span class="required">*</span></label
+          >
+          <div class="select-wrapper">
+            <select
+              id="tipo_documento_codigo"
+              formControlName="tipo_documento_codigo"
             >
-              <span *ngIf="telefono?.errors?.['pattern']"
-                >Formato: 9XXXXXXXX</span
-              >
-            </div>
+              <option *ngFor="let tipo of tiposDocumento" [value]="tipo.codigo">
+                {{ tipo.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
           </div>
+        </div>
 
-          <!-- Correo Electrónico -->
-          <div class="form-field">
-            <label for="correo"></label>
+        <!-- Número de Documento -->
+        <div class="form-field">
+          <label for="numero_documento"
+            >Número de Documento <span class="required">*</span></label
+          >
+          <input
+            type="text"
+            id="numero_documento"
+            formControlName="numero_documento"
+            placeholder="Ej: 12345678"
+            [class.invalid]="
+              numero_documento?.invalid && numero_documento?.touched
+            "
+          />
+          <div
+            class="error-message"
+            *ngIf="numero_documento?.invalid && numero_documento?.touched"
+          >
+            <span>Número de documento obligatorio (mínimo 6 caracteres)</span>
+          </div>
+        </div>
+
+        <!-- Nacionalidad -->
+        <div class="form-field">
+          <label for="id_nacionalidad"
+            >Nacionalidad <span class="required">*</span></label
+          >
+          <div class="select-wrapper">
+            <select id="id_nacionalidad" formControlName="id_nacionalidad">
+              <option value="">Seleccione nacionalidad</option>
+              <option *ngFor="let nac of nacionalidades" [value]="nac.id">
+                {{ nac.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Otra Nacionalidad (condicional) -->
+        <div
+          class="form-field"
+          *ngIf="beneficiaryForm.get('id_nacionalidad')?.value === 4"
+        >
+          <label for="nacionalidad_otro"
+            >Especifique Nacionalidad <span class="required">*</span></label
+          >
+          <input
+            type="text"
+            id="nacionalidad_otro"
+            formControlName="nacionalidad_otro"
+            placeholder="Especifique la nacionalidad"
+          />
+        </div>
+
+        <!-- Sexo -->
+        <div class="form-field">
+          <label for="sexo">Sexo <span class="required">*</span></label>
+          <div class="select-wrapper">
+            <select
+              id="sexo"
+              formControlName="sexo"
+              [class.invalid]="sexo?.invalid && sexo?.touched"
+            >
+              <option value="">Seleccione sexo</option>
+              <option *ngFor="let gen of generos" [value]="gen.value">
+                {{ gen.label }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Fecha de Nacimiento -->
+        <div class="form-field">
+          <label for="fecha_nacimiento"
+            >Fecha de Nacimiento <span class="required">*</span></label
+          >
+          <input
+            type="date"
+            id="fecha_nacimiento"
+            formControlName="fecha_nacimiento"
+            [class.invalid]="
+              fecha_nacimiento?.invalid && fecha_nacimiento?.touched
+            "
+          />
+        </div>
+
+        <!-- Edad (texto opcional) -->
+        <div class="form-field">
+          <label for="edad_texto">Edad (opcional)</label>
+          <input
+            type="text"
+            id="edad_texto"
+            formControlName="edad_texto"
+            placeholder="Ej: 25"
+            maxlength="5"
+          />
+        </div>
+
+        <!-- Teléfono -->
+        <div class="form-field">
+          <label for="telefono">Teléfono</label>
+          <input
+            type="tel"
+            id="telefono"
+            formControlName="telefono"
+            placeholder="987654321"
+            maxlength="9"
+            [class.invalid]="telefono?.invalid && telefono?.touched"
+          />
+          <div
+            class="error-message"
+            *ngIf="telefono?.invalid && telefono?.touched"
+          >
+            <span>Formato: 9XXXXXXXX</span>
+          </div>
+        </div>
+
+        <!-- Correo Electrónico -->
+        <div class="form-field">
+          <label for="correo_electronico">Correo Electrónico</label>
+          <input
+            type="email"
+            id="correo_electronico"
+            formControlName="correo_electronico"
+            placeholder="ejemplo@correo.com"
+            [class.invalid]="
+              correo_electronico?.invalid && correo_electronico?.touched
+            "
+          />
+          <div
+            class="error-message"
+            *ngIf="correo_electronico?.invalid && correo_electronico?.touched"
+          >
+            <span>Correo inválido</span>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- PASO 2: UBIGEO Y DOMICILIO -->
+    <!-- ============================================ -->
+    <div class="step-content" *ngIf="currentStep === 2">
+      <div class="step-header">
+        <h3>Ubigeo y Domicilio</h3>
+      </div>
+
+      <div class="form-grid">
+        <!-- Departamento -->
+        <div class="form-field">
+          <label for="id_departamento"
+            >Departamento <span class="required">*</span></label
+          >
+          <div class="select-wrapper">
+            <select
+              id="id_departamento"
+              formControlName="id_departamento"
+              [class.invalid]="
+                id_departamento?.invalid && id_departamento?.touched
+              "
+            >
+              <option value="">Seleccione departamento</option>
+              <option *ngFor="let dep of departamentos" [value]="dep.id">
+                {{ dep.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Provincia -->
+        <div class="form-field">
+          <label for="id_provincia"
+            >Provincia <span class="required">*</span></label
+          >
+          <div class="select-wrapper">
+            <select
+              id="id_provincia"
+              formControlName="id_provincia"
+              [class.invalid]="id_provincia?.invalid && id_provincia?.touched"
+            >
+              <option value="">Seleccione provincia</option>
+              <option *ngFor="let prov of provincias" [value]="prov.id">
+                {{ prov.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Distrito -->
+        <div class="form-field">
+          <label for="id_distrito"
+            >Distrito <span class="required">*</span></label
+          >
+          <div class="select-wrapper">
+            <select
+              id="id_distrito"
+              formControlName="id_distrito"
+              [class.invalid]="id_distrito?.invalid && id_distrito?.touched"
+            >
+              <option value="">Seleccione distrito</option>
+              <option *ngFor="let dist of distritos" [value]="dist.id">
+                {{ dist.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Estado Civil -->
+        <div class="form-field">
+          <label for="id_estado_civil"
+            >Estado Civil <span class="required">*</span></label
+          >
+          <div class="select-wrapper">
+            <select id="id_estado_civil" formControlName="id_estado_civil">
+              <option value="">Seleccione estado civil</option>
+              <option *ngFor="let estado of estadosCiviles" [value]="estado.id">
+                {{ estado.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- ¿Tiene Hijos? -->
+        <div class="form-field">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="tiene_hijos" />
+            <span>¿Tiene hijos?</span>
+          </label>
+        </div>
+
+        <!-- Número de Hijos (condicional) -->
+        <div
+          class="form-field"
+          *ngIf="beneficiaryForm.get('tiene_hijos')?.value"
+        >
+          <label for="numero_hijos"
+            >Número de Hijos <span class="required">*</span></label
+          >
+          <input
+            type="number"
+            id="numero_hijos"
+            formControlName="numero_hijos"
+            min="1"
+            placeholder="0"
+          />
+        </div>
+
+        <!-- Dirección Actual -->
+        <div class="form-field full-width">
+          <label for="direccion_actual">Dirección Actual</label>
+          <input
+            type="text"
+            id="direccion_actual"
+            formControlName="direccion_actual"
+            placeholder="Ingrese dirección completa (calle, número, etc.)"
+          />
+        </div>
+
+        <!-- Referencia -->
+        <div class="form-field full-width">
+          <label for="referencia">Referencia</label>
+          <input
+            type="text"
+            id="referencia"
+            formControlName="referencia"
+            placeholder="Punto de referencia para ubicar el domicilio"
+          />
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- SECCIÓN APODERADO (opcional y colapsable) -->
+      <!-- ========================================== -->
+      <div class="apoderado-section">
+        <button
+          type="button"
+          class="toggle-apoderado"
+          (click)="toggleApoderado()"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>Agregar Datos del Apoderado (Opcional)</span>
+          <svg
+            class="chevron"
+            [class.rotated]="mostrarApoderado"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <div class="apoderado-content" *ngIf="mostrarApoderado">
+          <div class="info-box">
+            <p class="info-text">
+              Complete esta sección solo si el beneficiario requiere un
+              apoderado o tutor legal.
+            </p>
+          </div>
+
+          <div class="form-grid">
+            <!-- Nombres del Apoderado -->
+            <div class="form-field full-width">
+              <label for="apoderado_nombres"
+                >Nombres Completos del Apoderado</label
+              >
+              <input
+                type="text"
+                id="apoderado_nombres"
+                formControlName="apoderado_nombres"
+                placeholder="Ingrese nombres completos del apoderado"
+              />
+            </div>
+
+            <!-- Parentesco -->
+            <div class="form-field">
+              <label for="apoderado_id_parentesco">Parentesco</label>
+              <div class="select-wrapper">
+                <select
+                  id="apoderado_id_parentesco"
+                  formControlName="apoderado_id_parentesco"
+                >
+                  <option [value]="null">Seleccione parentesco</option>
+                  <option
+                    *ngFor="let parentesco of parentescos"
+                    [value]="parentesco.id"
+                  >
+                    {{ parentesco.nombre }}
+                  </option>
+                </select>
+                <svg
+                  class="select-icon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Tipo de Documento del Apoderado -->
+            <div class="form-field">
+              <label for="apoderado_tipo_documento">Tipo de Documento</label>
+              <div class="select-wrapper">
+                <select
+                  id="apoderado_tipo_documento"
+                  formControlName="apoderado_tipo_documento"
+                >
+                  <option
+                    *ngFor="let tipo of tiposDocumento"
+                    [value]="tipo.codigo"
+                  >
+                    {{ tipo.nombre }}
+                  </option>
+                </select>
+                <svg
+                  class="select-icon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Número de Documento del Apoderado -->
+            <div class="form-field">
+              <label for="apoderado_numero_documento"
+                >Número de Documento</label
+              >
+              <input
+                type="text"
+                id="apoderado_numero_documento"
+                formControlName="apoderado_numero_documento"
+                placeholder="Ej: 12345678"
+              />
+            </div>
+
+            <!-- Teléfono del Apoderado -->
+            <div class="form-field">
+              <label for="apoderado_telefono">Teléfono</label>
+              <input
+                type="tel"
+                id="apoderado_telefono"
+                formControlName="apoderado_telefono"
+                placeholder="987654321"
+                maxlength="9"
+              />
+            </div>
+
+            <!-- Dirección del Apoderado -->
+            <div class="form-field full-width">
+              <label for="apoderado_direccion">Dirección</label>
+              <input
+                type="text"
+                id="apoderado_direccion"
+                formControlName="apoderado_direccion"
+                placeholder="Dirección completa del apoderado"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- PASO 3: DISCAPACIDAD -->
+    <!-- ============================================ -->
+    <div class="step-content" *ngIf="currentStep === 3">
+      <div class="step-header">
+        <h3>Información de Discapacidad</h3>
+      </div>
+
+      <div class="form-grid">
+        <!-- ¿Tiene Carnet CONADIS? -->
+        <div class="form-field">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="tiene_carnet_conadis" />
+            <span>¿Tiene Carnet CONADIS? <span class="required">*</span></span>
+          </label>
+        </div>
+
+        <!-- Número de Carnet (condicional) -->
+        <div
+          class="form-field"
+          *ngIf="beneficiaryForm.get('tiene_carnet_conadis')?.value"
+        >
+          <label for="numero_carnet_conadis"
+            >Número de Carnet CONADIS <span class="required">*</span></label
+          >
+          <input
+            type="text"
+            id="numero_carnet_conadis"
+            formControlName="numero_carnet_conadis"
+            placeholder="Ingrese número de carnet"
+          />
+        </div>
+
+        <!-- ¿Tiene Certificado de Discapacidad? -->
+        <div class="form-field">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              formControlName="tiene_certificado_discapacidad"
+            />
+            <span
+              >¿Tiene Certificado de Discapacidad?
+              <span class="required">*</span></span
+            >
+          </label>
+        </div>
+
+        <!-- Grado de Discapacidad -->
+        <div class="form-field">
+          <label for="id_grado_discapacidad">Grado de Discapacidad</label>
+          <div class="select-wrapper">
+            <select
+              id="id_grado_discapacidad"
+              formControlName="id_grado_discapacidad"
+            >
+              <option [value]="null">Seleccione grado</option>
+              <option
+                *ngFor="let grado of gradosDiscapacidad"
+                [value]="grado.id"
+              >
+                {{ grado.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Tipo de Discapacidad -->
+        <div class="form-field">
+          <label for="id_tipo_discapacidad">Tipo de Discapacidad</label>
+          <div class="select-wrapper">
+            <select
+              id="id_tipo_discapacidad"
+              formControlName="id_tipo_discapacidad"
+            >
+              <option [value]="null">Seleccione tipo</option>
+              <option *ngFor="let tipo of tiposDiscapacidad" [value]="tipo.id">
+                {{ tipo.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Otra Discapacidad (condicional) -->
+        <div
+          class="form-field full-width"
+          *ngIf="beneficiaryForm.get('id_tipo_discapacidad')?.value === 7"
+        >
+          <label for="discapacidad_otro"
+            >Especifique el tipo de discapacidad</label
+          >
+          <input
+            type="text"
+            id="discapacidad_otro"
+            formControlName="discapacidad_otro"
+            placeholder="Describa el tipo de discapacidad"
+          />
+        </div>
+
+        <!-- Código CIE-10 -->
+        <div class="form-field">
+          <label for="cie10">Código CIE-10</label>
+          <input
+            type="text"
+            id="cie10"
+            formControlName="cie10"
+            placeholder="Ej: G80.0"
+          />
+        </div>
+
+        <!-- Causa de Discapacidad -->
+        <div class="form-field">
+          <label for="id_causa_discapacidad">Causa de Discapacidad</label>
+          <div class="select-wrapper">
+            <select
+              id="id_causa_discapacidad"
+              formControlName="id_causa_discapacidad"
+            >
+              <option [value]="null">Seleccione causa</option>
+              <option
+                *ngFor="let causa of causasDiscapacidad"
+                [value]="causa.id"
+              >
+                {{ causa.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Ayuda Biomecánica -->
+        <div class="form-field">
+          <label for="id_ayuda_biomecanica"
+            >Ayuda Biomecánica que utiliza</label
+          >
+          <div class="select-wrapper">
+            <select
+              id="id_ayuda_biomecanica"
+              formControlName="id_ayuda_biomecanica"
+            >
+              <option [value]="null">Seleccione ayuda</option>
+              <option
+                *ngFor="let ayuda of ayudasBiomecanicas"
+                [value]="ayuda.id"
+              >
+                {{ ayuda.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- PASO 4: SALUD Y TRATAMIENTO -->
+    <!-- ============================================ -->
+    <div class="step-content" *ngIf="currentStep === 4">
+      <div class="step-header">
+        <h3>Salud y Tratamiento</h3>
+      </div>
+
+      <div class="form-grid">
+        <!-- ¿Recibe Atención Médica? -->
+        <div class="form-field">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="recibe_atencion_medica" />
+            <span>¿Recibe atención médica?</span>
+          </label>
+        </div>
+
+        <!-- ¿Toma Medicamentos? -->
+        <div class="form-field">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="toma_medicamentos" />
+            <span>¿Toma medicamentos?</span>
+          </label>
+        </div>
+
+        <!-- Tratamiento -->
+        <div class="form-field full-width">
+          <label for="tratamiento">Tratamiento o Terapias</label>
+          <textarea
+            id="tratamiento"
+            formControlName="tratamiento"
+            rows="3"
+            placeholder="Describa el tratamiento o terapias que recibe"
+          ></textarea>
+        </div>
+
+        <!-- ¿Otras Personas con Discapacidad en Casa? -->
+        <div class="form-field">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              formControlName="otras_personas_discapacidad"
+            />
+            <span>¿Hay otras personas con discapacidad en su hogar?</span>
+          </label>
+        </div>
+
+        <!-- Cuántas Personas (condicional) -->
+        <div
+          class="form-field"
+          *ngIf="beneficiaryForm.get('otras_personas_discapacidad')?.value"
+        >
+          <label for="cuantas_personas_discapacidad">¿Cuántas personas?</label>
+          <input
+            type="number"
+            id="cuantas_personas_discapacidad"
+            formControlName="cuantas_personas_discapacidad"
+            min="1"
+            placeholder="0"
+          />
+        </div>
+
+        <!-- Tipo de Seguro -->
+        <div class="form-field">
+          <label for="id_seguro">Tipo de Seguro</label>
+          <div class="select-wrapper">
+            <select id="id_seguro" formControlName="id_seguro">
+              <option [value]="null">Seleccione seguro</option>
+              <option *ngFor="let seguro of tiposSeguros" [value]="seguro.id">
+                {{ seguro.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- PASO 5: EDUCACIÓN Y TRABAJO -->
+    <!-- ============================================ -->
+    <div class="step-content" *ngIf="currentStep === 5">
+      <div class="step-header">
+        <h3>Educación y Trabajo</h3>
+      </div>
+
+      <div class="form-grid">
+        <!-- Grado de Instrucción -->
+        <div class="form-field">
+          <label for="id_grado_instruccion">Grado de Instrucción</label>
+          <div class="select-wrapper">
+            <select
+              id="id_grado_instruccion"
+              formControlName="id_grado_instruccion"
+            >
+              <option [value]="null">Seleccione grado</option>
+              <option
+                *ngFor="let grado of gradosInstruccion"
+                [value]="grado.id"
+              >
+                {{ grado.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Centro de Estudios -->
+        <div class="form-field">
+          <label for="centro_estudios">Centro de Estudios</label>
+          <input
+            type="text"
+            id="centro_estudios"
+            formControlName="centro_estudios"
+            placeholder="Nombre de la institución educativa"
+          />
+        </div>
+
+        <!-- Carrera / Especialidad -->
+        <div class="form-field">
+          <label for="carrera">Carrera o Especialidad</label>
+          <input
+            type="text"
+            id="carrera"
+            formControlName="carrera"
+            placeholder="Carrera técnica o profesional"
+          />
+        </div>
+
+        <!-- Idiomas -->
+        <div class="form-field">
+          <label for="idiomas">Idiomas</label>
+          <input
+            type="text"
+            id="idiomas"
+            formControlName="idiomas"
+            placeholder="Ej: Español, Inglés"
+          />
+        </div>
+
+        <!-- ¿Recibió Test Vocacional? -->
+        <div class="form-field">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="recibio_test_vocacional" />
+            <span>¿Recibió test vocacional?</span>
+          </label>
+        </div>
+
+        <!-- Dónde recibió el test (condicional) -->
+        <div
+          class="form-field"
+          *ngIf="beneficiaryForm.get('recibio_test_vocacional')?.value"
+        >
+          <label for="test_vocacional_donde">¿Dónde recibió el test?</label>
+          <input
+            type="text"
+            id="test_vocacional_donde"
+            formControlName="test_vocacional_donde"
+            placeholder="Nombre de la institución"
+          />
+        </div>
+
+        <!-- ¿Labora Actualmente? -->
+        <div class="form-field">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="labora_actualmente" />
+            <span>¿Labora actualmente?</span>
+          </label>
+        </div>
+
+        <!-- Lugar de Trabajo (condicional) -->
+        <div
+          class="form-field"
+          *ngIf="beneficiaryForm.get('labora_actualmente')?.value"
+        >
+          <label for="lugar_trabajo"
+            >Lugar de Trabajo <span class="required">*</span></label
+          >
+          <input
+            type="text"
+            id="lugar_trabajo"
+            formControlName="lugar_trabajo"
+            placeholder="Nombre de la empresa o institución"
+          />
+        </div>
+
+        <!-- Función que Desempeña (condicional) -->
+        <div
+          class="form-field full-width"
+          *ngIf="beneficiaryForm.get('labora_actualmente')?.value"
+        >
+          <label for="funcion_desempena"
+            >Función que Desempeña <span class="required">*</span></label
+          >
+          <input
+            type="text"
+            id="funcion_desempena"
+            formControlName="funcion_desempena"
+            placeholder="Describa su función o cargo"
+          />
+        </div>
+
+        <!-- Tipo de Apoyo que Requiere -->
+        <div class="form-field">
+          <label for="id_tipo_apoyo">Tipo de Apoyo que Requiere</label>
+          <div class="select-wrapper">
+            <select id="id_tipo_apoyo" formControlName="id_tipo_apoyo">
+              <option [value]="null">Seleccione tipo de apoyo</option>
+              <option *ngFor="let apoyo of tiposApoyo" [value]="apoyo.id">
+                {{ apoyo.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Actividad Deportiva -->
+        <div class="form-field">
+          <label for="id_actividad_deportiva">Actividad Deportiva</label>
+          <div class="select-wrapper">
+            <select
+              id="id_actividad_deportiva"
+              formControlName="id_actividad_deportiva"
+            >
+              <option [value]="null">Seleccione actividad</option>
+              <option
+                *ngFor="let actividad of actividadesDeportivas"
+                [value]="actividad.id"
+              >
+                {{ actividad.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- PASO 6: VIVIENDA Y CONVIVENCIA -->
+    <!-- ============================================ -->
+    <div class="step-content" *ngIf="currentStep === 6">
+      <div class="step-header">
+        <h3>Vivienda y Convivencia</h3>
+      </div>
+
+      <div class="form-grid">
+        <!-- Condición de Vivienda -->
+        <div class="form-field">
+          <label for="id_condicion_vivienda">Condición de la Vivienda</label>
+          <div class="select-wrapper">
+            <select
+              id="id_condicion_vivienda"
+              formControlName="id_condicion_vivienda"
+            >
+              <option [value]="null">Seleccione condición</option>
+              <option
+                *ngFor="let condicion of condicionesVivienda"
+                [value]="condicion.id"
+              >
+                {{ condicion.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Tipo de Vivienda -->
+        <div class="form-field">
+          <label for="id_tipo_vivienda">Tipo de Vivienda</label>
+          <div class="select-wrapper">
+            <select id="id_tipo_vivienda" formControlName="id_tipo_vivienda">
+              <option [value]="null">Seleccione tipo</option>
+              <option *ngFor="let tipo of tiposVivienda" [value]="tipo.id">
+                {{ tipo.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Con Quién Vive -->
+        <div class="form-field">
+          <label for="id_con_quien_vive">¿Con quién vive?</label>
+          <div class="select-wrapper">
+            <select id="id_con_quien_vive" formControlName="id_con_quien_vive">
+              <option [value]="null">Seleccione opción</option>
+              <option
+                *ngFor="let opcion of opcionesConQuienVive"
+                [value]="opcion.id"
+              >
+                {{ opcion.descripcion }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Programa Social -->
+        <div class="form-field">
+          <label for="id_programa_social">Programa Social</label>
+          <div class="select-wrapper">
+            <select
+              id="id_programa_social"
+              formControlName="id_programa_social"
+            >
+              <option [value]="null">Seleccione programa</option>
+              <option
+                *ngFor="let programa of programasSociales"
+                [value]="programa.id"
+              >
+                {{ programa.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Servicios Básicos (Checkboxes múltiples) -->
+        <div class="form-field full-width">
+          <label>Servicios Básicos</label>
+          <div class="checkbox-group">
+            <label
+              class="checkbox-label"
+              *ngFor="let servicio of serviciosBasicos"
+            >
+              <input
+                type="checkbox"
+                [value]="servicio.id"
+                (change)="onServicioBasicoChange($event, servicio.id)"
+              />
+              <span>{{ servicio.nombre }}</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Nombre del Registrador -->
+        <div class="form-field full-width">
+          <label for="nombres_registrador"
+            >Nombre del Registrador <span class="required">*</span></label
+          >
+          <input
+            type="text"
+            id="nombres_registrador"
+            formControlName="nombres_registrador"
+            placeholder="Nombre de quien registra"
+            [class.invalid]="
+              nombres_registrador?.invalid && nombres_registrador?.touched
+            "
+          />
+          <div
+            class="error-message"
+            *ngIf="nombres_registrador?.invalid && nombres_registrador?.touched"
+          >
+            <span>El nombre del registrador es obligatorio</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="form-navigation">
+      <button
+        type="button"
+        (click)="previousStep()"
+        class="btn-secondary"
+        *ngIf="currentStep > 1"
+      >
+        Anterior
+      </button>
+
+      <button type="button" (click)="onCancel()" class="btn-cancel">
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        (click)="nextStep()"
+        class="btn-primary"
+        *ngIf="currentStep < totalSteps"
+      >
+        Siguiente
+      </button>
+
+      <button
+        type="submit"
+        class="btn-primary"
+        *ngIf="currentStep === totalSteps"
+      >
+        Guardar Registro
+      </button>
+    </div>
   </form>
 </main>
