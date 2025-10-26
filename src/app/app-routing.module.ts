@@ -12,7 +12,7 @@ export const routes: Routes = [
   {
     path: '',
     redirectTo: '/home',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   // Rutas de autenticación (usuarios no autenticados)
   {
@@ -37,33 +37,33 @@ export const routes: Routes = [
         data: {
           roles: ['ADMIN', 'TSOCIAL', 'COORDINADOR', 'JEFE'],
           breadcrumb: 'Inicio',
-        }
+        },
       },
-      // Registro de Beneficiarios 
+      // Registro de Beneficiarios
       {
         path: 'beneficiary-registration',
         loadChildren: () => import('./features/beneficiary-registration/beneficiary-registration.module').then(m => m.BeneficiaryRegistrationModule),
         canActivate: [RoleGuard],
         title: 'Registro de Beneficiarios - AyudAi',
         data: {
-          roles: ['ADMIN', 'T-SOCIAL'],
+          roles: ['ADMIN', 'TSOCIAL'],
           breadcrumb: 'Registro de Beneficiarios',
           //permissions: ['view_transactions'] //habilitar cuando se tenga el sistema de permisos
-        }
+        },
       },
-      // Clasificación y Priorización 
+      // Clasificación y Priorización
       {
         path: 'classification-prioritization',
         loadChildren: () => import('./features/classification-prioritization/classification-prioritization.module').then(m => m.ClassificationPrioritizationModule),
         canActivate: [RoleGuard],
         title: 'Clasificación y Priorización - AyudAi',
         data: {
-          roles: ['ADMIN', 'T-SOCIAL', 'COORDINADOR'],
+          roles: ['ADMIN', 'TSOCIAL', 'COORDINADOR'],
           breadcrumb: 'Clasificación y Priorización',
           //permissions: ['view_transactions'] //habilitar cuando se tenga el sistema de permisos
-        }
+        },
       },
-      // Reportes y Auditoría 
+      // Reportes y Auditoría
       {
         path: 'reports-audit',
         loadChildren: () => import('./features/reports-audit/reports-audit.module').then(m => m.ReportsAuditModule),
@@ -73,7 +73,7 @@ export const routes: Routes = [
           roles: ['ADMIN', 'COORDINADOR', 'JEFE'],
           breadcrumb: 'Reportes y Auditoría',
           //permissions: ['view_transactions'] //habilitar cuando se tenga el sistema de permisos
-        }
+        },
       },
       // // Cuentas - Usuarios y Admins
       // {
@@ -135,7 +135,7 @@ export const routes: Routes = [
       //     breadcrumb: 'Configuraciones'
       //   }
       // }
-    ]
+    ],
   },
   // Rutas de error y páginas especiales
   // {
@@ -169,16 +169,16 @@ export const routes: Routes = [
   // Redirección para rutas no encontradas
   {
     path: '**',
-    redirectTo: '/404'
-  }
+    redirectTo: '/404',
+  },
 ];
 
-
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {
-    preloadingStrategy: PreloadAllModules
-  })],
-  exports: [RouterModule]
+  imports: [
+    RouterModule.forRoot(routes, {
+      preloadingStrategy: PreloadAllModules,
+    }),
+  ],
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
-
+export class AppRoutingModule {}

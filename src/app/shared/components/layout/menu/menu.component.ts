@@ -25,48 +25,46 @@ interface MenuData {
   standalone: true,
   imports: [NgIf, NgFor],
   templateUrl: './menu.component.html',
-  styleUrl: './menu.component.scss'
+  styleUrl: './menu.component.scss',
 })
 export class MenuComponent implements OnInit {
   menuData: MenuData = {
-    "menu": [
+    menu: [
       {
-          "title": "Inicio",
-          "icon": "fas fa-home",
-          "link": "/home",
-          "submenu": null
+        title: 'Inicio',
+        icon: 'fas fa-home',
+        link: '/home',
+        submenu: null,
       },
       {
-          "title": "Registro de Beneficiarios",
-          "icon": "fas fa-credit-card",
-          "link": "beneficiary-registration",
-          "submenu": null
+        title: 'Registro de Beneficiarios',
+        icon: 'fas fa-users',
+        link: 'beneficiary-registration',
+        submenu: null,
       },
       {
-          "title": "Clasificación y Priorización",
-          "icon": "fas fa-shield-alt",
-          "link": "classification-prioritization",
-          "submenu": null
+        title: 'Clasificación y Priorización',
+        icon: 'fas fa-bullseye',
+        link: 'classification-prioritization',
+        submenu: null,
       },
       {
-          "title": "Reportes y Auditoría",
-          "icon": "fas fa-file-alt",
-          "link": "reports-audit",
-          "submenu": null
-      }
-    ]
+        title: 'Reportes y Auditoría',
+        icon: 'fas fa-chart-bar',
+        link: 'reports-audit',
+        submenu: null,
+      },
+    ],
   };
 
   isMobileMenuOpen = false;
   activeMenuItem: string = '/';
 
-  constructor(
-    private router: Router
-  ) {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
     // Inicializar el estado expanded de los items
-    this.menuData.menu.forEach(item => {
+    this.menuData.menu.forEach((item) => {
       item.expanded = false;
     });
   }
@@ -89,7 +87,7 @@ export class MenuComponent implements OnInit {
 
     if (item.submenu && item.submenu.length > 0) {
       // Cerrar todos los otros submenús primero
-      this.menuData.menu.forEach(menuItem => {
+      this.menuData.menu.forEach((menuItem) => {
         if (menuItem !== item) {
           menuItem.expanded = false;
         }
@@ -133,7 +131,7 @@ export class MenuComponent implements OnInit {
   }
 
   collapseAllSubmenus(): void {
-    this.menuData.menu.forEach(item => {
+    this.menuData.menu.forEach((item) => {
       item.expanded = false;
     });
 
@@ -155,7 +153,9 @@ export class MenuComponent implements OnInit {
     }
 
     if (item.submenu) {
-      return item.submenu.some(subItem => subItem.link === this.activeMenuItem);
+      return item.submenu.some(
+        (subItem) => subItem.link === this.activeMenuItem
+      );
     }
 
     return false;

@@ -1,71 +1,81 @@
-
 // Custom Theming for Angular Material
 // For more information: https://material.angular.dev/guide/theming
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 // Declaración de fuentes
 
 @font-face {
-  font-family: 'Bebas Neue Pro Book';
-  src: url('./assets/fonts/Bebas-Neue-Pro-Book.woff2') format('woff2'),
-       url('./assets/fonts/Bebas-Neue-Pro-Book.woff') format('woff');
+  font-family: "Bebas Neue Pro Book";
+  src: url("./assets/fonts/Bebas-Neue-Pro-Book.woff2") format("woff2"),
+    url("./assets/fonts/Bebas-Neue-Pro-Book.woff") format("woff");
 }
 
 @font-face {
-  font-family: 'Bebas Neue Pro Regular';
-  src: url('./assets/fonts/Bebas-Neue-Pro-Regular.woff2') format('woff2'),
-       url('./assets/fonts/Bebas-Neue-Pro-Regular.woff') format('woff');
+  font-family: "Bebas Neue Pro Regular";
+  src: url("./assets/fonts/Bebas-Neue-Pro-Regular.woff2") format("woff2"),
+    url("./assets/fonts/Bebas-Neue-Pro-Regular.woff") format("woff");
 }
 
 @font-face {
-  font-family: 'Bebas Neue Pro Bold';
-  src: url('./assets/fonts/Bebas-Neue-Pro-Bold.woff2') format('woff2'),
-       url('./assets/fonts/Bebas-Neue-Pro-Bold.woff') format('woff');
+  font-family: "Bebas Neue Pro Bold";
+  src: url("./assets/fonts/Bebas-Neue-Pro-Bold.woff2") format("woff2"),
+    url("./assets/fonts/Bebas-Neue-Pro-Bold.woff") format("woff");
 }
 
 @font-face {
-  font-family: 'Arial Narrow';
-  src: url('./assets/fonts/arialnarrow.woff2') format('woff2'),
-       url('./assets/fonts/arialnarrow.woff') format('woff');
+  font-family: "Arial Narrow";
+  src: url("./assets/fonts/arialnarrow.woff2") format("woff2"),
+    url("./assets/fonts/arialnarrow.woff") format("woff");
 }
 
 @font-face {
-  font-family: 'Arial Narrow Italic';
-  src: url('./assets/fonts/arialnarrow-italic.woff2') format('woff2'),
-       url('./assets/fonts/arialnarrow-italic.woff') format('woff');
+  font-family: "Arial Narrow Italic";
+  src: url("./assets/fonts/arialnarrow-italic.woff2") format("woff2"),
+    url("./assets/fonts/arialnarrow-italic.woff") format("woff");
 }
 
 @font-face {
-  font-family: 'Arial Narrow Bold';
-  src: url('./assets/fonts/arialnarrow-bold.woff2') format('woff2'),
-       url('./assets/fonts/arialnarrow-bold.woff') format('woff');
+  font-family: "Arial Narrow Bold";
+  src: url("./assets/fonts/arialnarrow-bold.woff2") format("woff2"),
+    url("./assets/fonts/arialnarrow-bold.woff") format("woff");
 }
 
 :root {
+  //Nueva declaracion CAMBIOS DE COLOR Y TIPOGRAFIAS
+  --color-azul-principal: #165dff; /* Header azul intenso */
+  --color-azul-hover: #3c84ff;
+  --color-blanco: #ffffff;
+  --color-gris-claro: #f5f9ff;
+  --color-texto: #1f1f1f;
+  --fuente-principal: "Inter", sans-serif;
+
   // Declaración de variables para Colores principales
-  --color-rojo: #EB0A1E;
-  --color-gris-oscuro: #4A4A4A;
+
+  --color-rojo: #eb0a1e;
+  --color-gris-oscuro: #4a4a4a;
 
   // Declaración de variables para Colores secundarios o de fondo
-  --color-gris-claro: #E9EAE8;
-  --color-azul-claro: #82CEE6;
+  --color-gris-claro: #e9eae8;
+  --color-azul-claro: #82cee6;
 
   // Declaración de variables para las tipografías
-  --bebas-pro-book: 'Bebas Neue Pro Book', sans-serif;
-  --bebas-pro-regular: 'Bebas Neue Pro Regular', sans-serif;
-  --bebas-pro-bold: 'Bebas Neue Pro Bold', sans-serif;
+  --bebas-pro-book: "Bebas Neue Pro Book", sans-serif;
+  --bebas-pro-regular: "Bebas Neue Pro Regular", sans-serif;
+  --bebas-pro-bold: "Bebas Neue Pro Bold", sans-serif;
 
-  --arial-narrow-regular: 'Arial Narrow', sans-serif;
-  --arial-narrow-italic: 'Arial Narrow Italic', sans-serif;
-  --arial-narrow-bold: 'Arial Narrow Bold', sans-serif;
+  --arial-narrow-regular: "Arial Narrow", sans-serif;
+  --arial-narrow-italic: "Arial Narrow Italic", sans-serif;
+  --arial-narrow-bold: "Arial Narrow Bold", sans-serif;
 
   // Declaración de variables para sombras
   --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-  --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
-
-
 
 // html {
 //   @include mat.theme((
@@ -80,26 +90,30 @@
 // }/* You can add global styles to this file, and also import other style files */
 
 * {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
-html, body { height: 100%; }
+html,
 body {
-  margin: 0;
-  background: #ECEEF0;
-  font-family: var(--arial-narrow-regular),
-  Roboto, sans-serif;
+  height: 100%;
+}
+body {
+  margin: 0px;
+  background-color: #f6fafd;
+  font-family: "Inter", sans-serif;
+  color: #1a202c;
+  min-height: 100vh;
 }
 
 @keyframes fadeInUp {
   from {
-      opacity: 0;
-      transform: translateY(30px);
+    opacity: 0;
+    transform: translateY(30px);
   }
   to {
-      opacity: 1;
-      transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

@@ -1,35 +1,26 @@
 .footer {
-  background: var(--color-gris-oscuro);
-  backdrop-filter: blur(10px);
-  border-radius: 20px 20px 0 0;
-  padding: 20px 0px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: fixed;
-  bottom: 0;
-  z-index: 100;
+  background-color: #2d3748;
+  padding: 20px;
   text-align: center;
-  width: 100%;
+  font-size: 14px;
+  font-family: var(--arial-narrow-regular); // o 'Inter', sans-serif
+  color: #f7fafc; // blanco azulado
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-  .footer-text {
-    width: fit-content;
-    font-size: 1rem;
-    color: #FFFFFF;
-    margin: 0 auto;
-    text-align: center;
-  }
+.footer-text {
+  margin: 0;
 }
 
 @keyframes fadeInUp {
   from {
-      opacity: 0;
-      transform: translateY(30px);
+    opacity: 0;
+    transform: translateY(30px);
   }
   to {
-      opacity: 1;
-      transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
