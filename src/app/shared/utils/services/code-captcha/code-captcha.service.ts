@@ -3,25 +3,32 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '@environments/environment';
 import { CodeCaptchaRequest, CodeCaptchaResponse } from '@core/models/auth/code-captcha.interface';
+import { ApiResponse } from '@core/models/response/api-response-base.module';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CodeCaptchaService {
-  private readonly apiUrl = `${environment.apiUrl}/Seguridad`;
+  private readonly apiUrl = `${environment.apiUrl}/captcha`;
 
   constructor(private http: HttpClient) {}
 
   /**
    * Genera la Url para obtener el código Captcha
-   * @param number - Solicitud con código para generar el captcha
    * @returns Promise con la respuesta del captcha
    */
-  getUrlCodeCaptcha(number: number): string {
+  async getUrlCodeCaptcha(): Promise<CodeCaptchaResponse> {
     try {
-      return `${this.apiUrl}/Captcha/${number}`;
+      const response = await firstValueFrom(
+        this.http.get<ApiResponse<CodeCaptchaResponse>>(`${this.apiUrl}`, {
+          observe: 'body',
+          responseType: 'json'
+        })
+      );
+  
+      return response.data!;
     } catch (error) {
-      console.error('Error en getKeyboardVirtual:', error);
+      console.error('Error en getCodeCaptcha:', error);
       throw error; // El interceptor de errores se encargará del manejo
     }
   }
@@ -31,19 +38,18 @@ export class CodeCaptchaService {
    * @param request - Codigo Captcha
    * @returns Promise con rspuesta de la validación de Captcha
    */
-  async postCheckCodeCaptcha(request: CodeCaptchaRequest): Promise<CodeCaptchaResponse> {
+  async postCheckCodeCaptcha(request: CodeCaptchaRequest): Promise<boolean> {
     try {
       const response = await firstValueFrom(
-        //this.http.post<CodeCaptchaResponse>(`${this.apiUrl}/VerificarCaptcha`, request, {
-        this.http.post<any>(`${this.apiUrl}/VerificarCaptcha`, request, {
+        this.http.post<ApiResponse<boolean>>(`${this.apiUrl}/validate`, request, {
           observe: 'body',
           responseType: 'json'
         })
       );
 
-      return response.data;
+      return response.data!;
     } catch (error) {
-      console.error('Error en getKeyboardVirtual:', error);
+      console.error('Error en postCheckCodeCaptcha:', error);
       throw error; // El interceptor de errores se encargará del manejo
     }
   }

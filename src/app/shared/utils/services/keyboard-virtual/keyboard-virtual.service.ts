@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '@environments/environment';
-import { KeyboardVirtualRequest, KeyboardVirtualResponse } from '@core/models/auth/keyboard-virtual.interface';
+import { KeyboardVirtualResponse } from '@core/models/auth/keyboard-virtual.interface';
+import { ApiResponse } from '@core/models/response/api-response-base.module';
 
 @Injectable({
   providedIn: 'root'
 })
 export class KeyboardVirtualService {
-  private readonly apiUrl = `${environment.apiUrl}/Seguridad/teclado`;
+  private readonly apiUrl = `${environment.apiUrl}/teclado`;
 
   constructor(private http: HttpClient) {}
 
@@ -17,16 +18,16 @@ export class KeyboardVirtualService {
    * @param request - Solicitud con código para generar el teclado
    * @returns Promise con la respuesta del teclado virtual
    */
-  async getKeyboardVirtual(request: KeyboardVirtualRequest): Promise<KeyboardVirtualResponse> {
+  async getKeyboardVirtual(request: number): Promise<KeyboardVirtualResponse> {
     try {
       const response = await firstValueFrom(
-        this.http.post<KeyboardVirtualResponse>(this.apiUrl, request, {
+        this.http.get<ApiResponse<KeyboardVirtualResponse>>(`${this.apiUrl}/${request}`, {
           observe: 'body',
           responseType: 'json'
         })
       );
 
-      return response;
+      return response.data!;
     } catch (error) {
       console.error('Error en getKeyboardVirtual:', error);
       throw error; // El interceptor de errores se encargará del manejo
@@ -38,7 +39,7 @@ export class KeyboardVirtualService {
    * @param requests - Array de solicitudes
    * @returns Promise con array de respuestas
    */
-  async getMultipleKeyboards(requests: KeyboardVirtualRequest[]): Promise<KeyboardVirtualResponse[]> {
+  async getMultipleKeyboards(requests: number[]): Promise<KeyboardVirtualResponse[]> {
     try {
       const promises = requests.map(request => this.getKeyboardVirtual(request));
       const responses = await Promise.all(promises);

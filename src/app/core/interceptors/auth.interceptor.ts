@@ -8,6 +8,7 @@ export const AuthInterceptor: HttpInterceptorFn = (
 ) => {
   const secureStorage = inject(SecureStorageService);
   const token = secureStorage.getItem('access_token');
+  const corrId = secureStorage.getItem('x_correlation_id');
 
   if (token && !req.url.includes('/auth/')) {
     const authReq = req.clone({
@@ -15,6 +16,7 @@ export const AuthInterceptor: HttpInterceptorFn = (
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
+        'X-Correlation-Id': corrId ? corrId : ''
       }
     });
     return next(authReq);

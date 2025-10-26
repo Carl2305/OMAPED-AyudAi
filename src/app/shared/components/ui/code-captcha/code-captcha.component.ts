@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { FormsModule } from "@angular/forms";
 import { RandomNumberService } from '@shared/utils/services/random-numer/random-number.service';
 import { CodeCaptchaService } from '@shared/utils/services/code-captcha/code-captcha.service';
+import { CodeCaptchaRequest } from '@core/models/auth/code-captcha.interface';
 
 @Component({
   selector: 'app-code-captcha',
@@ -22,10 +23,10 @@ export class CodeCaptchaComponent implements OnDestroy, OnChanges {
   error: boolean = false;
   validCaptcha: boolean = false;
   valueCodeCaptcha?: string = '';
+  tokenCaptcha?: string = '';
   private destroy$ = new Subject<void>();
 
   constructor(
-    private randomNumberService: RandomNumberService,
     private codeCaptchaService: CodeCaptchaService,
   ) {  }
 
@@ -71,24 +72,16 @@ export class CodeCaptchaComponent implements OnDestroy, OnChanges {
   private loadCodeCaptcha(): void {
     this.loading = true;
 
-    this.randomNumberService.generateSecureRandom(1, 100)
-      .then((result) => {
-        if (result) {
-          this.onLoadCodeCaptcha(result);
-        }
-      })
-      .catch((error) => {
-        console.error('Error generating random number:', error);
-        this.loading = false;
-      });
+    this.onLoadCodeCaptcha();
   }
 
-  private async onLoadCodeCaptcha(numberRandom: number): Promise<void> {
+  private async onLoadCodeCaptcha(): Promise<void> {
     try {
-      const response = this.codeCaptchaService.getUrlCodeCaptcha(numberRandom);
+      const response = this.codeCaptchaService.getUrlCodeCaptcha();
 
       if (response) {
-        this.urlImageCodeCaptcha = response;
+        this.urlImageCodeCaptcha = (await response).imageBase64;
+        this.tokenCaptcha = (await response).token;
         this.loadedCodeCaptcha = true;
         console.log('Code Captcha loaded successfully');
       } else {
@@ -111,9 +104,13 @@ export class CodeCaptchaComponent implements OnDestroy, OnChanges {
     this.loading = true;
 
     try {
-      const response = await this.codeCaptchaService.postCheckCodeCaptcha({ code : code });
+      const request: CodeCaptchaRequest = {
+        token: this.tokenCaptcha!,
+        userInput: code.toLocaleUpperCase()
+      };
+      const response = await this.codeCaptchaService.postCheckCodeCaptcha(request);
 
-      if (response && response.esValido) {
+      if (response) {
         this.validCaptcha = true;
         this.valueChange.emit(true);
       } else {
@@ -129,5 +126,12 @@ export class CodeCaptchaComponent implements OnDestroy, OnChanges {
       this.loading = false;
       this.error = !this.validCaptcha;
     }
+  }
+
+  toUppercase(ev: Event) {
+    const el = ev.target as HTMLInputElement;
+    const start = el.selectionStart, end = el.selectionEnd;
+    el.value = (el.value ?? '').toUpperCase();
+    if (start !== null && end !== null) el.setSelectionRange(start, end);
   }
 }

@@ -90,7 +90,7 @@
     <button
       type="submit"
       class="login-button"
-      [disabled]="loading || loginForm.invalid"
+      [disabled]="loading || loginForm.invalid || !validCaptcha"
     >
       <span *ngIf="loading" class="spinner"></span>
       <span>{{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}</span>

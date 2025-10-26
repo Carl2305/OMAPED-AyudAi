@@ -333,13 +333,13 @@ function createUserFriendlyError(error: HttpErrorResponse): HttpErrorResponse {
 }
 
 // Funciones auxiliares
-function getCurrentUserId(authService: AuthService): string | undefined {
-  let userId: string | undefined;
-  authService.currentUser$.subscribe(user => {
-    userId = ''; //user?.id;
-  }).unsubscribe();
-  return userId;
-}
+// function getCurrentUserId(authService: AuthService): string | undefined {
+//   let userId: string | undefined;
+//   authService.currentUser$.subscribe(user => {
+//     userId = ''; //user?.id;
+//   }).unsubscribe();
+//   return userId;
+// }
 
 function getSessionId(): string {
   // Obtiene o genera un ID de sesión

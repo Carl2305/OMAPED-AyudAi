@@ -1,6 +1,4 @@
-import { inject } from '@angular/core';
 import { HttpInterceptorFn } from '@angular/common/http';
-import { AuditLoggerService } from '@shared/utils/services/audit-logger/audit-logger.service';
 
 export const SecurityInterceptor: HttpInterceptorFn = (req, next) => {
   // const auditLogger = inject(AuditLoggerService);
@@ -15,8 +13,7 @@ export const SecurityInterceptor: HttpInterceptorFn = (req, next) => {
     setHeaders: {
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
-      'X-XSS-Protection': '1; mode=block',
-      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'X-XSS-Protection': '1; mode=block'
     }
   });
 

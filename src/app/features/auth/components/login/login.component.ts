@@ -7,8 +7,8 @@ import { SharedModule } from '@shared/shared.module';
 import { KeyboardValueChangeEvent, KeyboardVirtualComponent } from '@shared/components/ui/keyboard-virtual/keyboard-virtual.component';
 import { Key } from '@core/models/auth/keyboard-virtual.interface';
 import { CodeCaptchaComponent } from '@shared/components/ui/code-captcha/code-captcha.component';
-import { LoginRequest } from '@core/models/auth/user.interface';
-import { DeviceInfoService } from '@shared/utils/services/device-info/device-info.service';
+import { LoginRequest } from '@core/models/auth/auth.interface';
+import { UserService } from '@core/services/auth/user.service';
 
 @Component({
   selector: 'app-login',
@@ -30,9 +30,9 @@ export class LoginComponent {
   selectedKeys: Key[] = [];
   passwordNumericValue: string = '';
   codeKeyboard: number = 0;
-  deviceKeyboard: string = '';
+  deviceKeyboard: number = 0;
   validCaptcha: boolean = false;
-  private destroy$ = new Subject<void>();
+  //private destroy$ = new Subject<void>();
 
   showCodeCaptcha = false;
   shouldLoadCaptcha = false;
@@ -40,7 +40,7 @@ export class LoginComponent {
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
-    private deviceInfoService: DeviceInfoService,
+    private userService: UserService,
     private router: Router,
     private route: ActivatedRoute
   ) {
@@ -61,8 +61,8 @@ export class LoginComponent {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    // this.destroy$.next();
+    // this.destroy$.complete();
   }
 
   onPasswordInputClick(): void {
@@ -115,8 +115,6 @@ export class LoginComponent {
   }
 
   onCodeCaptchaValueChange(event: boolean): void {
-    console.log(event);
-
     this.validCaptcha = event;
   }
 
@@ -132,39 +130,30 @@ export class LoginComponent {
       this.loading = true;
       this.error = null;
 
-      const IP_DEVICE = await this.deviceInfoService.getClientIP();
-
       const loginData : LoginRequest = {
-        login: this.loginForm.get('username')?.value,
-        direccionIp: IP_DEVICE,
-        navegador: this.deviceInfoService.getBrowserName(),
-        clave: {
-          codigo: this.codeKeyboard,
-          dispositivo: this.deviceKeyboard,
-          digitos: this.selectedKeys.map(k => k.codigoHash!)
-        }
+        documento: this.loginForm.get('username')?.value,
+        codigo: this.codeKeyboard,
+        dispositivo: this.deviceKeyboard,
+        botones: this.selectedKeys.map(k => k.codigoHash!)
       };
 
-      this.authService.login(loginData)
-        .pipe(
-          finalize(() => this.loading = false),
-          takeUntil(this.destroy$)
-        )
-        .subscribe({
-          next: (response) => {
-            console.log(response);
-            if (response.exito && response.accessToken) {
-              this.router.navigate([this.returnUrl]);
-            } else {
-              //this.error = response.message || 'Error en el inicio de sesión';
-              this.error = 'Error en el inicio de sesión';
-            }
-          },
-          error: (error) => {
-            this.error = error.error?.message || 'Error de conexión. Intente nuevamente.';
-            console.error('Login error:', error);
-          }
-        });
+      const response_login = await this.authService.login(loginData).finally(() => this.loading = false);
+
+      if (response_login.success && response_login.data?.accessToken) {
+        console.log(response_login);
+        
+        const userResponse = await this.userService.getUsuarioInfo(this.authService.decodeToken(response_login.data.accessToken)!.sub!);
+        if (userResponse.success && userResponse.data) {
+          this.authService['secureStorage'].setItem('current_user', JSON.stringify(userResponse.data));
+          this.router.navigate([this.returnUrl]);
+        } else{
+          this.error = 'Error al obtener la información del usuario';
+          return;
+        }  
+      } else {
+        this.error = response_login.message || 'Error en el inicio de sesión';
+      }
+
     } else {
       if (!this.validCaptcha && this.passwordNumericValue.length === 6) {
         this.error = 'Por favor, complete la validación del captcha';

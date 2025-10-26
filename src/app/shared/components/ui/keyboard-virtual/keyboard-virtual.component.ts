@@ -1,6 +1,6 @@
 import { NgFor, NgIf } from '@angular/common';
 import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
-import { Key, KeyboardVirtualRequest, KeyboardVirtualResponse } from '@core/models/auth/keyboard-virtual.interface';
+import { Key, KeyboardVirtualResponse } from '@core/models/auth/keyboard-virtual.interface';
 import { KeyboardVirtualService } from '@shared/utils/services/keyboard-virtual/keyboard-virtual.service';
 import { RandomNumberService } from '@shared/utils/services/random-numer/random-number.service';
 import { Subject } from 'rxjs';
@@ -9,7 +9,7 @@ export interface KeyboardValueChangeEvent {
   keys: Key[];
   numericValue: string;
   code: number;
-  device: string;
+  device: number;
 }
 
 @Component({
@@ -29,7 +29,7 @@ export class KeyboardVirtualComponent implements OnDestroy {
   keyboard?: KeyboardVirtualResponse;
   passwordValue: string = '';
   codeKeyboard: number = 0;
-  deviceKeyboard: string = '';
+  deviceKeyboard: number = 0;
   private readonly MAX_LENGTH = 6;
   private destroy$ = new Subject<void>();
 
@@ -68,8 +68,7 @@ export class KeyboardVirtualComponent implements OnDestroy {
     this.randomNumberService.generateSecureRandom(1, 100)
       .then((result) => {
         if (result) {
-          const request: KeyboardVirtualRequest = { codigo: result.toString() };
-          this.onLoadKeyboardVirtual(request);
+          this.onLoadKeyboardVirtual(result);
         }
       })
       .catch((error) => {
@@ -84,7 +83,7 @@ export class KeyboardVirtualComponent implements OnDestroy {
     }
 
     this.value.push(key);
-    this.passwordValue += key.valorNumerico?.toString();
+    this.passwordValue += key.valor?.toString();
     this.emitValueChange();
   }
 
@@ -124,7 +123,7 @@ export class KeyboardVirtualComponent implements OnDestroy {
     return `${this.value.length}/${this.MAX_LENGTH}`;
   }
 
-  private async onLoadKeyboardVirtual(request: KeyboardVirtualRequest): Promise<void> {
+  private async onLoadKeyboardVirtual(request: number): Promise<void> {
     try {
       // Usar el método con reintentos automáticos
       const response = await this.keyboardVirtualService.getKeyboardVirtual(request);
@@ -132,7 +131,7 @@ export class KeyboardVirtualComponent implements OnDestroy {
       if (response && response.botones && response.botones.length > 0) {
         this.keyboard = response;
         this.codeKeyboard = response.codigo || 0;
-        this.deviceKeyboard = response.dispositivo || '';
+        this.deviceKeyboard = response.dispositivo || 0;
         this.loadedKeyboard = true;
         console.log('Keyboard loaded successfully');
       } else {

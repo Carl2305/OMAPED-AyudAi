@@ -1,7 +1,9 @@
 export interface CodeCaptchaResponse {
-  esValido?: boolean;
+  imageBase64: string;
+  token: string;
 }
 
 export interface CodeCaptchaRequest {
-  code?: string;
+  token: string;
+  userInput: string;
 }

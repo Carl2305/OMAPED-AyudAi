@@ -195,7 +195,7 @@
 .login-button {
   width: 100%;
   padding: 0.6rem;
-  background-color: var(--color-azul-claro);
+  background-color: var(--color-rojo);
   color: #fafafa;
   border: none;
   border-radius: 8px;
@@ -212,7 +212,7 @@
 }
 
 .login-button:hover:not(:disabled) {
-  background-color: var(--color-rojo);
+  background-color: var(--color-azul-claro);
   transform: translateY(-2px);
   color: #FFFFFF;
 }

@@ -1,52 +1,58 @@
 // src/app/core/services/auth/auth.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, firstValueFrom, Observable, tap } from 'rxjs';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { BehaviorSubject, firstValueFrom, map, Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { SecureStorageService } from '@shared/utils/services/storage/secure-storage.service';
-import { LoginRequest, LoginResponse, User } from '@core/models/auth/user.interface';
+import { UsuarioInfoResponse } from '@core/models/auth/user.interface';
 import { environment } from '@environments/environment';
-
-// Interface para el payload del token JWT
-interface JwtPayload {
-  exp?: number;        // Expiration time
-  iat?: number;        // Issued at
-  sub?: string;        // Subject
-  user?: User;         // User data
-  roles?: string[];    // User roles
-  [key: string]: any;  // Custom claims
-}
+import { LoginRequest, LoginResponse, JwtPayload } from '@core/models/auth/auth.interface';
+import { ApiResponse } from '@core/models/response/api-response-base.module';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly apiUrl = `${environment.apiUrl}`;
-  private currentUserSubject = new BehaviorSubject<LoginResponse | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
+  // private currentUserSubject = new BehaviorSubject<UsuarioInfoResponse | null>(null);
+  // public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(
     private http: HttpClient,
-    private secureStorage: SecureStorageService
+    private secureStorage: SecureStorageService,
+    //private userService: UserService
   ) {
-    this.loadCurrentUser();
+    //this.loadCurrentUser();
   }
 
-  login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/token/Generar`, credentials)
-      .pipe(
-        tap(response => {
-          if (response.exito && response.accessToken) {
-            this.secureStorage.setItem('access_token', response.accessToken);
-            this.currentUserSubject.next(response);
-          }
+  async login(request: LoginRequest): Promise<ApiResponse<LoginResponse>> {
+    try {
+      const resp = await firstValueFrom(
+        this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrl}/login`, request, {
+          observe: 'response'
         })
       );
+
+      const corrId =
+        resp.headers.get('X-Correlation-Id') ??
+        resp.headers.get('x-correlation-id');
+      if (corrId) this.secureStorage.setItem('x_correlation_id', corrId);
+      
+      console.log(resp, resp.headers);
+      
+      const body = resp.body!;
+      this.secureStorage.setItem('access_token', body.data!.accessToken!);
+      return body;
+    } catch (error) {
+      console.error('Error en login:', error);
+      throw error; // El interceptor de errores se encargará del manejo
+    }
   }
 
   logout(): void {
     this.secureStorage.clearAll();
-    this.currentUserSubject.next(null);
+    //this.currentUserSubject.next(null);
   }
 
   isAuthenticated(): boolean {
@@ -54,13 +60,12 @@ export class AuthService {
     return token ? !this.isTokenExpired(token) : false;
   }
 
-  hasRole(role: string): boolean {
-    const user = this.currentUserSubject.value;
-    //return user?.roles?.includes(role) ?? false;
-    return 'USER' === role; // Ajusta según el valor real que viene en el campo 'perfil'
+  hasRole(role: string): boolean {    
+    const user = JSON.parse(this.secureStorage.getItem('current_user')!);    
+    return (user?.rol === role);
   }
 
-  hasAnyRole(roles: string[]): boolean {
+  hasAnyRole(roles: string[]): boolean {    
     return roles.some(role => this.hasRole(role));
   }
 
@@ -76,7 +81,7 @@ export class AuthService {
 
   // Verificar si el token está expirado
   isTokenExpired(token: string): boolean {
-    const decoded = this.decodeToken(token);
+    const decoded = this.decodeToken(token);    
     if (!decoded || !decoded.exp) return true;
 
     // Convertir timestamp de segundos a milisegundos
@@ -117,7 +122,7 @@ export class AuthService {
       if (userJson) {
         try {
           const user = JSON.parse(userJson);
-          this.currentUserSubject.next(user);
+          //this.currentUserSubject.next(user);
         } catch (error) {
           console.error('Error parsing user data:', error);
           this.logout();

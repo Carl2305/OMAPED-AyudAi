@@ -18,7 +18,7 @@ export const routes: Routes = [
   {
     path: 'auth',
     component: AuthLayoutComponent,
-    //canActivate: [GuestGuard], // Solo usuarios no autenticados
+    canActivate: [GuestGuard], // Solo usuarios no autenticados
     loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule),
     title: 'Autenticación - AyudAi'
   },
@@ -26,17 +26,16 @@ export const routes: Routes = [
   {
     path: '',
     component: MainLayoutComponent,
-    //canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
     children: [
       // Dashboard/Home - Acceso básico para usuarios
       {
         path: 'home',
-        //loadChildren: () => import('./features/home/home.module').then(m => m.HomeModule),
         component: HomeComponent,
-        //canActivate: [RoleGuard],
+        canActivate: [RoleGuard],
         title: 'Inicio - AyudAi',
         data: {
-          roles: ['USER'],
+          roles: ['ADMIN', 'TSOCIAL', 'COORDINADOR', 'JEFE'],
           breadcrumb: 'Inicio',
         }
       },
@@ -44,10 +43,10 @@ export const routes: Routes = [
       {
         path: 'beneficiary-registration',
         loadChildren: () => import('./features/beneficiary-registration/beneficiary-registration.module').then(m => m.BeneficiaryRegistrationModule),
-        //canActivate: [RoleGuard],
+        canActivate: [RoleGuard],
         title: 'Registro de Beneficiarios - AyudAi',
         data: {
-          roles: ['USER', 'ADMIN', 'MANAGER'],
+          roles: ['ADMIN', 'T-SOCIAL'],
           breadcrumb: 'Registro de Beneficiarios',
           //permissions: ['view_transactions'] //habilitar cuando se tenga el sistema de permisos
         }
@@ -56,10 +55,10 @@ export const routes: Routes = [
       {
         path: 'classification-prioritization',
         loadChildren: () => import('./features/classification-prioritization/classification-prioritization.module').then(m => m.ClassificationPrioritizationModule),
-        //canActivate: [RoleGuard],
+        canActivate: [RoleGuard],
         title: 'Clasificación y Priorización - AyudAi',
         data: {
-          roles: ['USER', 'ADMIN', 'MANAGER'],
+          roles: ['ADMIN', 'T-SOCIAL', 'COORDINADOR'],
           breadcrumb: 'Clasificación y Priorización',
           //permissions: ['view_transactions'] //habilitar cuando se tenga el sistema de permisos
         }
@@ -68,10 +67,10 @@ export const routes: Routes = [
       {
         path: 'reports-audit',
         loadChildren: () => import('./features/reports-audit/reports-audit.module').then(m => m.ReportsAuditModule),
-        //canActivate: [RoleGuard],
+        canActivate: [RoleGuard],
         title: 'Reportes y Auditoría - AyudAi',
         data: {
-          roles: ['USER', 'ADMIN', 'MANAGER'],
+          roles: ['ADMIN', 'COORDINADOR', 'JEFE'],
           breadcrumb: 'Reportes y Auditoría',
           //permissions: ['view_transactions'] //habilitar cuando se tenga el sistema de permisos
         }

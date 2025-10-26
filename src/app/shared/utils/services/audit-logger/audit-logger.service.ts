@@ -242,9 +242,9 @@ export class AuditLoggerService {
   private getCurrentUser(): any {
     // Obtiene el usuario actual del AuthService
     let currentUser = null;
-    this.authService.currentUser$.subscribe(user => {
-      currentUser = user;
-    }).unsubscribe();
+    // this.authService.currentUser$.subscribe(user => {
+    //   currentUser = user;
+    // }).unsubscribe();
     return currentUser;
   }
 

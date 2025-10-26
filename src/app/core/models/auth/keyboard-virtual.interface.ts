@@ -1,15 +1,12 @@
 export interface KeyboardVirtualResponse {
   codigo?: number;
-  dispositivo?: string;
+  dispositivo?: number;
   botones?: Key[];
 }
 
 export interface Key {
   codigoHash?: string;
-  imagenBase64?: string;
-  valorNumerico?: number;
+  imagen?: string;
+  valor?: number;
 }
 
-export interface KeyboardVirtualRequest {
-  codigo?: string;
-}
