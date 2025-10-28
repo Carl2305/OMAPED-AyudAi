@@ -65,28 +65,6 @@
       </div>
 
       <div class="form-grid">
-        <!-- Nombres Completos -->
-        <div class="form-field full-width">
-          <label for="nombres_completos">
-            Nombres Completos <span class="required">*</span>
-          </label>
-          <input
-            type="text"
-            id="nombres_completos"
-            formControlName="nombres_completos"
-            placeholder="Ingrese nombres y apellidos completos"
-            [class.invalid]="
-              nombres_completos?.invalid && nombres_completos?.touched
-            "
-          />
-          <div
-            class="error-message"
-            *ngIf="nombres_completos?.invalid && nombres_completos?.touched"
-          >
-            <span>El nombre completo es obligatorio (mínimo 3 caracteres)</span>
-          </div>
-        </div>
-
         <!-- Tipo de Documento -->
         <div class="form-field">
           <label for="tipo_documento_codigo"
@@ -121,20 +99,45 @@
           <label for="numero_documento"
             >Número de Documento <span class="required">*</span></label
           >
-          <input
-            type="text"
-            id="numero_documento"
-            formControlName="numero_documento"
-            placeholder="Ej: 12345678"
-            [class.invalid]="
-              numero_documento?.invalid && numero_documento?.touched
-            "
-          />
+          <div class="input-with-button">
+            <input
+              type="text"
+              id="numero_documento"
+              formControlName="numero_documento"
+              placeholder="Ej: 12345678"
+              [class.invalid]="
+                numero_documento?.invalid && numero_documento?.touched
+              "
+            />
+            <button type="button" class="btn-secondary" (click)="validateExistsBeneficiary()">
+              Buscar
+            </button>
+          </div>
           <div
             class="error-message"
             *ngIf="numero_documento?.invalid && numero_documento?.touched"
           >
             <span>Número de documento obligatorio (mínimo 6 caracteres)</span>
+          </div>
+        </div>
+
+        <!-- Nombres Completos -->
+        <div class="form-field full-width">
+          <label for="nombres_completos">
+            Nombres Completos <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="nombres_completos"
+            formControlName="nombres_completos"
+            placeholder="Ingrese nombres y apellidos completos"
+            [class.invalid]="nombres_completos?.invalid && nombres_completos?.touched"
+          />
+          <div
+            class="error-message"
+            *ngIf="nombres_completos?.invalid && nombres_completos?.touched"
+          >
+            <span>El nombre completo es obligatorio (mínimo 3 caracteres)</span>
           </div>
         </div>
 
@@ -1241,7 +1244,7 @@
         </div>
 
         <!-- Nombre del Registrador -->
-        <div class="form-field full-width">
+        <!-- <div class="form-field full-width">
           <label for="nombres_registrador"
             >Nombre del Registrador <span class="required">*</span></label
           >
@@ -1260,7 +1263,7 @@
           >
             <span>El nombre del registrador es obligatorio</span>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
 
@@ -1275,7 +1278,7 @@
         Anterior
       </button>
 
-      <button type="button" (click)="onCancel()" class="btn-cancel">
+      <button type="button" (click)="onCancel()" class="btn-cancel" [disabled]="isDisabled">
         Cancelar
       </button>
 
@@ -1284,6 +1287,7 @@
         (click)="nextStep()"
         class="btn-primary"
         *ngIf="currentStep < totalSteps"
+        [disabled]="isDisabled"
       >
         Siguiente
       </button>
@@ -1292,6 +1296,7 @@
         type="submit"
         class="btn-primary"
         *ngIf="currentStep === totalSteps"
+         [disabled]="isDisabled"
       >
         Guardar Registro
       </button>

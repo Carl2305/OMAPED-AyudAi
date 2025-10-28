@@ -1,1 +1,33 @@
-<p>confirmation-dialog works!</p>
+<div class="dialog-container">
+  <!-- Header con icono -->
+  <div class="dialog-header">
+    <div class="icon-container" [ngClass]="getIconClass()">
+      <!-- <i class="{{ data.icon }}"></i> -->
+      <i class="{{ data.icon }} fa-2xl" style="color: #ffffff;"></i>
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="dialog-content">
+    <h2 class="dialog-title">{{ data.title }}</h2>
+    <p class="dialog-message">{{ data.message }}</p>
+  </div>
+
+  <!-- Botones de acción -->
+  <div class="dialog-actions">
+    <button
+      *ngIf="data.showCancel"
+      mat-button
+      class="btn-cancel"
+      (click)="onCancel()">
+      {{ data.cancelText }}
+    </button>
+    <button
+      mat-raised-button
+      class="btn-confirm"
+      [ngClass]="'btn-' + data.type"
+      (click)="onConfirm()">
+      {{ data.confirmText }}
+    </button>
+  </div>
+</div>

@@ -34,6 +34,7 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08),
   display: block;
   min-height: 100vh;
   background-color: $background-gray;
+  border-radius: 16px;
   font-family: $font-family;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -43,7 +44,7 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08),
 .main-content {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
 }
 
 // Title Card
@@ -235,7 +236,7 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08),
   input[type="email"],
   input[type="number"],
   textarea {
-    width: 100%;
+    //width: 100%;
     padding: 0.75rem 1rem;
     border: 1px solid $border-color;
     border-radius: 0.5rem;
@@ -257,6 +258,23 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08),
 
     &::placeholder {
       color: #9ca3af;
+    }
+  }
+
+  .input-with-button {
+    display: flex;
+    flex-direction: row;
+    gap: 0.75rem;
+    align-items: center;
+
+    input {
+      flex: 1 1 auto;
+    }
+
+    .btn-secondary {
+      flex-shrink: 0;
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
     }
   }
 

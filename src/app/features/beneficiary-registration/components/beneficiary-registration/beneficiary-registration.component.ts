@@ -6,6 +6,8 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { BeneficiaryRegistrationService } from '@features/beneficiary-registration/services/beneficiary-registration.service';
+import { ConfirmationDialogService } from '@shared/utils/services/confirmation-dialog/confirmation-dialog.service';
 
 @Component({
   selector: 'app-beneficiary-registration',
@@ -18,12 +20,14 @@ export class BeneficiaryRegistrationComponent implements OnInit {
   beneficiaryForm!: FormGroup;
   currentStep: number = 1;
   totalSteps: number = 6; // 6 pasos, apoderado va en paso 2
+  isDisabled: boolean = true;
 
+  //#region  data static
   // Catálogos según BD - Estos vendrán del backend
   tiposDocumento = [
-    { codigo: 'DNI', nombre: 'DNI' },
-    { codigo: 'CE', nombre: 'Carnet de Extranjería' },
-    { codigo: 'PASAPORTE', nombre: 'Pasaporte' },
+    { codigo: '001', nombre: 'DNI' },
+    { codigo: '002', nombre: 'Carnet de Extranjería' },
+    { codigo: '003', nombre: 'Pasaporte' },
   ];
 
   nacionalidades = [
@@ -52,8 +56,13 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     { id: 2, nombre: 'Piura', codigo: '20' },
   ];
 
-  provincias: any[] = [];
-  distritos: any[] = [];
+  provincias: any[] = [
+    { id: 1, nombre: 'Paita', departamento_codigo: 2 },
+    { id: 2, nombre: 'Sullana', departamento_codigo: 2 },
+  ];
+  distritos: any[] = [
+    { id: 1, nombre: 'Marcavelica', provincia_codigo: 2 },
+  ];
 
   gradosDiscapacidad = [
     { id: 1, nombre: 'Leve' },
@@ -173,10 +182,16 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     { id: 7, nombre: 'Otro' },
   ];
 
+  //#endregion
+
   selectedServiciosBasicos: number[] = [];
   mostrarApoderado: boolean = false; // Control para mostrar/ocultar sección apoderado
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder, 
+    private beneficiaryRegistrationService: BeneficiaryRegistrationService,
+    private confirmationDialogService: ConfirmationDialogService
+  ) {}
 
   ngOnInit(): void {
     this.initializeForm();
@@ -187,7 +202,7 @@ export class BeneficiaryRegistrationComponent implements OnInit {
       // 🟦 PASO 1: IDENTIDAD Y DATOS BÁSICOS
       nombres_completos: ['', [Validators.required, Validators.minLength(3)]],
       edad_texto: [''],
-      tipo_documento_codigo: ['DNI', Validators.required],
+      tipo_documento_codigo: ['001', Validators.required],
       numero_documento: ['', [Validators.required, Validators.minLength(6)]],
       id_nacionalidad: ['', Validators.required],
       nacionalidad_otro: [''],
@@ -247,17 +262,14 @@ export class BeneficiaryRegistrationComponent implements OnInit {
       // 🟦 APODERADO (opcional - va en Paso 2)
       apoderado_nombres: [''],
       apoderado_id_parentesco: [null],
-      apoderado_tipo_documento: ['DNI'],
+      apoderado_tipo_documento: ['001'],
       apoderado_numero_documento: [''],
       apoderado_telefono: [''],
       apoderado_direccion: [''],
-
-      // Datos institucionales (Paso 6)
-      esta_registrado_omaped: [true],
-      nombres_registrador: ['', Validators.required],
     });
 
     this.setupConditionalValidators();
+    this.setLockedForm(this.isDisabled);
   }
 
   setupConditionalValidators(): void {
@@ -322,6 +334,26 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     // Esta lógica se puede agregar si se necesita
   }
 
+  setLockedForm(lock: boolean) {
+    const names = ['nombres_completos', 'id_nacionalidad', 'nacionalidad_otro', 'sexo', 'fecha_nacimiento',
+    'edad_texto', 'telefono', 'correo_electronico', 'id_departamento', 'id_provincia', 'id_distrito', 'id_estado_civil',
+    'tiene_hijos', 'numero_hijos', 'direccion_actual', 'referencia', 'apoderado_nombres', 'apoderado_id_parentesco', 
+    'apoderado_tipo_documento', 'tiene_carnet_conadis', 'apoderado_numero_documento', 'apoderado_telefono', 'apoderado_direccion',
+    'tiene_carnet_conadis', 'numero_carnet_conadis', 'tiene_certificado_discapacidad', 'id_grado_discapacidad', 'id_tipo_discapacidad', 
+    'discapacidad_otro', 'id_causa_discapacidad', 'id_ayuda_biomecanica', 'recibe_atencion_medica', 'toma_medicamentos', 
+    'tratamiento', 'otras_personas_discapacidad', 'cuantas_personas_discapacidad', 'id_seguro', 'id_grado_instruccion', 
+    'centro_estudios', 'carrera', 'idiomas', 'recibio_test_vocacional',  'test_vocacional_donde', 'labora_actualmente', 
+    'lugar_trabajo', 'funcion_desempena', 'id_tipo_apoyo', 'id_actividad_deportiva', 'id_condicion_vivienda', 'id_tipo_vivienda', 
+    'id_con_quien_vive', 'id_programa_social', 'cie10'
+    ];
+
+    names.forEach(n => {
+      const c = this.beneficiaryForm.get(n);
+      if (!c) return;
+      lock ? c.disable({ emitEvent: false }) : c.enable({ emitEvent: false });
+    });
+  }
+
   toggleApoderado(): void {
     this.mostrarApoderado = !this.mostrarApoderado;
   }
@@ -347,25 +379,120 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     }
   }
 
+  async validateExistsBeneficiary(): Promise<void> {
+
+    if (this.beneficiaryForm.value.tipo_documento_codigo === '') {
+      this.confirmationDialogService.showWarning(
+        'Tipo de Documento Requerido',
+        'Por favor seleccione un tipo de documento antes de buscar.'
+      ).subscribe();
+      return;
+    }
+
+    if (this.numero_documento?.invalid) {
+      this.confirmationDialogService.showWarning(
+        'Número de Documento Inválido',
+        'Por favor ingrese un número de documento válido antes de buscar.'
+      ).subscribe();
+      this.numero_documento?.markAsTouched();
+      return;
+    }
+
+    const response = await this.beneficiaryRegistrationService.getValidateExistsBeneficiary(
+      this.beneficiaryForm.value.tipo_documento_codigo,
+      this.beneficiaryForm.value.numero_documento
+    );
+
+    if (response.data) {
+      // El beneficiario ya existe - preguntar si desea actualizar
+      this.confirmationDialogService.showConfirm(
+        'Beneficiario Ya Registrado',
+        'El beneficiario ya está registrado en el sistema. ¿Desea actualizar los datos existentes?',
+        'Sí, actualizar',
+        'No, cancelar'
+      ).subscribe(actualizar => {
+        if (actualizar) {
+          this.confirmationDialogService.showInfo(
+            'Función en Desarrollo',
+            'Se invocará el servicio para traer todos los datos del beneficiario y actualizar.'
+          ).subscribe();
+          // TODO: Aquí invocar el servicio para traer los datos del beneficiario
+        } else {
+          this.confirmationDialogService.showInfo(
+            'Operación Cancelada',
+            'La operación ha sido cancelada por el usuario.'
+          ).subscribe();
+        }
+      });
+    } else {
+      // El beneficiario no existe - informar y permitir continuar con el registro
+      this.confirmationDialogService.showInfo(
+        'Nuevo Registro',
+        'El beneficiario no existe en el sistema. Puede continuar con el registro.',
+        'Continuar'
+      ).subscribe();
+    }
+    this.isDisabled = response.data!;
+    this.setLockedForm(this.isDisabled);
+  }
+
   isStepCompleted(step: number): boolean {
     return step < this.currentStep;
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
+    console.log(this.beneficiaryForm.value);
     if (this.beneficiaryForm.valid) {
       const dataToSend = {
         beneficiario: this.beneficiaryForm.value,
         servicios_basicos: this.selectedServiciosBasicos,
         apoderado: this.prepareApoderadoData(),
       };
+      console.log(this.beneficiaryForm.value);
+      
       console.log('✅ Datos para enviar al backend:', dataToSend);
-      alert('Formulario enviado correctamente. Revisa la consola.');
-      // Aquí irá la llamada al servicio
-      // this.beneficiaryService.create(dataToSend).subscribe(...)
+      
+      try {
+        const response = await this.beneficiaryRegistrationService.postCreateBeneficiary(dataToSend);
+        console.log('Respuesta del backend:', response);
+        
+        // Mostrar mensaje de éxito
+        this.confirmationDialogService.showSuccess(
+          '¡Registro Exitoso!',
+          'El beneficiario ha sido registrado correctamente en el sistema.',
+          'Aceptar'
+        ).subscribe(() => {
+          // Opcional: Resetear formulario o navegar a otra página
+          this.beneficiaryForm.reset({
+            tipo_documento_codigo: 'DNI',
+            tiene_hijos: false,
+            tiene_carnet_conadis: false,
+            tiene_certificado_discapacidad: false,
+            recibe_atencion_medica: false,
+            toma_medicamentos: false,
+            otras_personas_discapacidad: false,
+            labora_actualmente: false,
+            recibio_test_vocacional: false,
+            esta_registrado_omaped: true,
+          });
+          this.currentStep = 1;
+        });
+      } catch (error) {
+        console.error('Error al guardar:', error);
+        this.confirmationDialogService.showError(
+          'Error al Guardar',
+          'No se pudo registrar el beneficiario. Por favor, verifica los datos e intenta nuevamente.',
+          'Cerrar'
+        ).subscribe();
+      }
     } else {
       console.log('❌ Formulario inválido');
       this.markAllAsTouched();
-      alert('Por favor complete todos los campos requeridos');
+      this.confirmationDialogService.showWarning(
+        'Formulario Incompleto',
+        'Por favor complete todos los campos requeridos antes de continuar.',
+        'Entendido'
+      ).subscribe();
     }
   }
 
@@ -396,25 +523,32 @@ export class BeneficiaryRegistrationComponent implements OnInit {
   }
 
   onCancel(): void {
-    if (
-      confirm(
-        '¿Está seguro de cancelar? Se perderán todos los datos ingresados.'
-      )
-    ) {
-      this.beneficiaryForm.reset({
-        tipo_documento_codigo: 'DNI',
-        tiene_hijos: false,
-        tiene_carnet_conadis: false,
-        tiene_certificado_discapacidad: false,
-        recibe_atencion_medica: false,
-        toma_medicamentos: false,
-        otras_personas_discapacidad: false,
-        labora_actualmente: false,
-        recibio_test_vocacional: false,
-        esta_registrado_omaped: true,
-      });
-      this.currentStep = 1;
-    }
+    this.confirmationDialogService.showConfirm(
+      '¿Cancelar Registro?',
+      'Tienes cambios sin guardar. Si cancelas, se perderán todos los datos ingresados. ¿Estás seguro?',
+      'Sí, cancelar',
+      'No, continuar'
+    ).subscribe(confirmar => {
+      if (confirmar) {
+        this.beneficiaryForm.reset({
+          tipo_documento_codigo: 'DNI',
+          tiene_hijos: false,
+          tiene_carnet_conadis: false,
+          tiene_certificado_discapacidad: false,
+          recibe_atencion_medica: false,
+          toma_medicamentos: false,
+          otras_personas_discapacidad: false,
+          labora_actualmente: false,
+          recibio_test_vocacional: false,
+          esta_registrado_omaped: true,
+        });
+        this.currentStep = 1;
+        this.confirmationDialogService.showInfo(
+          'Registro Cancelado',
+          'El formulario ha sido limpiado correctamente.'
+        ).subscribe();
+      }
+    });
   }
 
   private markAllAsTouched(): void {

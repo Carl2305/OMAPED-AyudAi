@@ -17,6 +17,7 @@ export interface JwtPayload {
   sub?: string;   
   jti?: string;   
   documento?: string;  
+  usuario?: string;  
   auth_time?: string;     
   nbf?: number;        
   exp?: number;   

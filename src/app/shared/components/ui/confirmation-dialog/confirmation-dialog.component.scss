@@ -1,0 +1,215 @@
+// Estilos del componente de diálogo de confirmación
+// Utiliza el pantone de la aplicación definido en styles.scss y tailwind.config.js
+
+.dialog-container {
+  padding: 0;
+  min-width: 400px;
+  max-width: 500px;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background: var(--color-blanco);
+
+  @media (max-width: 640px) {
+    min-width: 280px;
+    max-width: 90vw;
+  }
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1.5rem 1rem;
+}
+
+.icon-container {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  .dialog-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--color-blanco);
+  }
+}
+
+// Estilos para cada tipo de icono según el pantone
+.icon-info {
+  background: linear-gradient(135deg, var(--color-azul-principal) 0%, var(--color-azul-hover) 100%);
+}
+
+.icon-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.icon-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.icon-error {
+  background: linear-gradient(135deg, var(--color-rojo) 0%, #dc2626 100%);
+}
+
+.icon-confirm {
+  background: linear-gradient(135deg, var(--color-azul-claro) 0%, #0891b2 100%);
+}
+
+.dialog-content {
+  padding: 1.5rem 2rem;
+  text-align: center;
+
+  @media (max-width: 640px) {
+    padding: 1rem 1.5rem;
+  }
+}
+
+.dialog-title {
+  font-family: var(--bebas-pro-bold);
+  font-size: 1.75rem;
+  color: var(--color-texto);
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.5px;
+
+  @media (max-width: 640px) {
+    font-size: 1.5rem;
+  }
+}
+
+.dialog-message {
+  font-family: var(--arial-narrow-regular);
+  font-size: 1rem;
+  color: var(--color-gris-oscuro);
+  line-height: 1.6;
+  margin: 0;
+
+  @media (max-width: 640px) {
+    font-size: 0.9rem;
+  }
+}
+
+.dialog-actions {
+  padding: 1rem 2rem 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  @media (max-width: 640px) {
+    padding: 1rem 1.5rem 1.5rem;
+    flex-direction: column;
+  }
+}
+
+// Estilos de botones
+.btn-cancel {
+  padding: 0.75rem 2rem;
+  font-family: var(--bebas-pro-regular);
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+  color: var(--color-gris-oscuro);
+  border: 2px solid var(--color-gris-claro);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  min-width: 120px;
+
+  &:hover {
+    background-color: var(--color-gris-claro);
+    border-color: var(--color-gris-oscuro);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+
+  @media (max-width: 640px) {
+    width: 100%;
+  }
+}
+
+.btn-confirm {
+  padding: 0.75rem 2rem;
+  font-family: var(--bebas-pro-bold);
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+  color: var(--color-blanco);
+  border: none;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow);
+  min-width: 120px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  @media (max-width: 640px) {
+    width: 100%;
+  }
+}
+
+// Botones específicos por tipo
+.btn-info {
+  background: linear-gradient(135deg, var(--color-azul-principal) 0%, var(--color-azul-hover) 100%);
+
+  &:hover {
+    background: linear-gradient(135deg, var(--color-azul-hover) 0%, var(--color-azul-principal) 100%);
+  }
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+
+  &:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  }
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+
+  &:hover {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  }
+}
+
+.btn-error {
+  background: linear-gradient(135deg, var(--color-rojo) 0%, #dc2626 100%);
+
+  &:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  }
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, var(--color-azul-claro) 0%, #0891b2 100%);
+
+  &:hover {
+    background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+  }
+}
+
+// Animaciones
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dialog-container {
+  animation: fadeIn 0.3s ease-out;
+}
