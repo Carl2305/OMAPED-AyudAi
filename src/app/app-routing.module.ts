@@ -18,7 +18,7 @@ export const routes: Routes = [
   {
     path: 'auth',
     component: AuthLayoutComponent,
-    canActivate: [GuestGuard], // Solo usuarios no autenticados
+    //canActivate: [GuestGuard], // Solo usuarios no autenticados
     loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule),
     title: 'Autenticación - AyudAi'
   },
@@ -26,13 +26,13 @@ export const routes: Routes = [
   {
     path: '',
     component: MainLayoutComponent,
-    canActivate: [AuthGuard],
+    //canActivate: [AuthGuard],
     children: [
       // Dashboard/Home - Acceso básico para usuarios
       {
         path: 'home',
         component: HomeComponent,
-        canActivate: [RoleGuard],
+        //canActivate: [RoleGuard],
         title: 'Inicio - AyudAi',
         data: {
           roles: ['ADMIN', 'TSOCIAL', 'COORDINADOR', 'JEFE'],
@@ -43,7 +43,7 @@ export const routes: Routes = [
       {
         path: 'beneficiary-registration',
         loadChildren: () => import('./features/beneficiary-registration/beneficiary-registration.module').then(m => m.BeneficiaryRegistrationModule),
-        canActivate: [RoleGuard],
+        //canActivate: [RoleGuard],
         title: 'Registro de Beneficiarios - AyudAi',
         data: {
           roles: ['ADMIN', 'TSOCIAL'],
@@ -55,7 +55,7 @@ export const routes: Routes = [
       {
         path: 'classification-prioritization',
         loadChildren: () => import('./features/classification-prioritization/classification-prioritization.module').then(m => m.ClassificationPrioritizationModule),
-        canActivate: [RoleGuard],
+        //canActivate: [RoleGuard],
         title: 'Clasificación y Priorización - AyudAi',
         data: {
           roles: ['ADMIN', 'TSOCIAL', 'COORDINADOR'],
@@ -67,7 +67,7 @@ export const routes: Routes = [
       {
         path: 'reports-audit',
         loadChildren: () => import('./features/reports-audit/reports-audit.module').then(m => m.ReportsAuditModule),
-        canActivate: [RoleGuard],
+        //canActivate: [RoleGuard],
         title: 'Reportes y Auditoría - AyudAi',
         data: {
           roles: ['ADMIN', 'COORDINADOR', 'JEFE'],
