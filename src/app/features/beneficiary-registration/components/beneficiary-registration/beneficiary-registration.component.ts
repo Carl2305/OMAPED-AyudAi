@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { BeneficiaryRegistrationService } from '@features/beneficiary-registration/services/beneficiary-registration.service';
 import { ConfirmationDialogService } from '@shared/utils/services/confirmation-dialog/confirmation-dialog.service';
+import { BeneficiaryResponse } from '@core/models/beneficiary/beneficiary-response.interface';
 
 @Component({
   selector: 'app-beneficiary-registration',
@@ -21,6 +22,8 @@ export class BeneficiaryRegistrationComponent implements OnInit {
   currentStep: number = 1;
   totalSteps: number = 6; // 6 pasos, apoderado va en paso 2
   isDisabled: boolean = true;
+  isEditMode: boolean = false; // Indica si estamos editando un beneficiario existente
+  currentBeneficiaryId: number | null = null; // ID del beneficiario en modo edición
 
   //#region  data static
   // Catálogos según BD - Estos vendrán del backend
@@ -404,19 +407,37 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     );
 
     if (response.data) {
-      // El beneficiario ya existe - preguntar si desea actualizar
+      // El beneficiario ya existe - preguntar si desea cargar los datos
       this.confirmationDialogService.showConfirm(
         'Beneficiario Ya Registrado',
-        'El beneficiario ya está registrado en el sistema. ¿Desea actualizar los datos existentes?',
-        'Sí, actualizar',
+        'El beneficiario ya está registrado en el sistema. ¿Desea cargar los datos existentes para visualizarlos o actualizarlos?',
+        'Sí, cargar datos',
         'No, cancelar'
-      ).subscribe(actualizar => {
-        if (actualizar) {
-          this.confirmationDialogService.showInfo(
-            'Función en Desarrollo',
-            'Se invocará el servicio para traer todos los datos del beneficiario y actualizar.'
-          ).subscribe();
-          // TODO: Aquí invocar el servicio para traer los datos del beneficiario
+      ).subscribe(async (cargarDatos) => {
+        if (cargarDatos) {
+          try {
+            // Obtener los datos completos del beneficiario
+            const beneficiaryResponse = await this.beneficiaryRegistrationService.getBeneficiaryByDocument(
+              this.beneficiaryForm.value.tipo_documento_codigo,
+              this.beneficiaryForm.value.numero_documento
+            );
+
+            if (beneficiaryResponse.data) {
+              // Cargar los datos en el formulario
+              this.loadBeneficiaryData(beneficiaryResponse.data);
+              
+              this.confirmationDialogService.showSuccess(
+                'Datos Cargados',
+                'Los datos del beneficiario se han cargado correctamente en el formulario.'
+              ).subscribe();
+            }
+          } catch (error) {
+            console.error('Error al cargar datos del beneficiario:', error);
+            this.confirmationDialogService.showError(
+              'Error al Cargar Datos',
+              'No se pudieron cargar los datos del beneficiario. Por favor, intenta nuevamente.'
+            ).subscribe();
+          }
         } else {
           this.confirmationDialogService.showInfo(
             'Operación Cancelada',
@@ -446,42 +467,55 @@ export class BeneficiaryRegistrationComponent implements OnInit {
       const dataToSend = {
         beneficiario: this.beneficiaryForm.value,
         servicios_basicos: this.selectedServiciosBasicos,
-        apoderado: this.prepareApoderadoData(),
+        apoderado: (this.mostrarApoderado) ? this.prepareApoderadoData() : null,
       };
       console.log(this.beneficiaryForm.value);
       
       console.log('✅ Datos para enviar al backend:', dataToSend);
       
       try {
-        const response = await this.beneficiaryRegistrationService.postCreateBeneficiary(dataToSend);
-        console.log('Respuesta del backend:', response);
+        let response;
         
-        // Mostrar mensaje de éxito
-        this.confirmationDialogService.showSuccess(
-          '¡Registro Exitoso!',
-          'El beneficiario ha sido registrado correctamente en el sistema.',
-          'Aceptar'
-        ).subscribe(() => {
-          // Opcional: Resetear formulario o navegar a otra página
-          this.beneficiaryForm.reset({
-            tipo_documento_codigo: 'DNI',
-            tiene_hijos: false,
-            tiene_carnet_conadis: false,
-            tiene_certificado_discapacidad: false,
-            recibe_atencion_medica: false,
-            toma_medicamentos: false,
-            otras_personas_discapacidad: false,
-            labora_actualmente: false,
-            recibio_test_vocacional: false,
-            esta_registrado_omaped: true,
+        // Determinar si es creación o actualización
+        if (this.isEditMode && this.currentBeneficiaryId !== null) {
+          // MODO ACTUALIZACIÓN
+          response = await this.beneficiaryRegistrationService.putUpdateBeneficiary(
+            this.currentBeneficiaryId,
+            dataToSend
+          );
+          console.log('Respuesta del backend (actualización):', response);
+          
+          // Mostrar mensaje de éxito de actualización
+          this.confirmationDialogService.showSuccess(
+            '¡Actualización Exitosa!',
+            'Los datos del beneficiario han sido actualizados correctamente en el sistema.',
+            'Aceptar'
+          ).subscribe(() => {
+            this.resetForm();
           });
-          this.currentStep = 1;
-        });
+        } else {
+          // MODO CREACIÓN
+          response = await this.beneficiaryRegistrationService.postCreateBeneficiary(dataToSend);
+          console.log('Respuesta del backend (creación):', response);
+          
+          // Mostrar mensaje de éxito de creación
+          this.confirmationDialogService.showSuccess(
+            '¡Registro Exitoso!',
+            'El beneficiario ha sido registrado correctamente en el sistema.',
+            'Aceptar'
+          ).subscribe(() => {
+            this.resetForm();
+          });
+        }
       } catch (error) {
         console.error('Error al guardar:', error);
+        const mensaje = this.isEditMode 
+          ? 'No se pudo actualizar el beneficiario. Por favor, verifica los datos e intenta nuevamente.'
+          : 'No se pudo registrar el beneficiario. Por favor, verifica los datos e intenta nuevamente.';
+        
         this.confirmationDialogService.showError(
           'Error al Guardar',
-          'No se pudo registrar el beneficiario. Por favor, verifica los datos e intenta nuevamente.',
+          mensaje,
           'Cerrar'
         ).subscribe();
       }
@@ -494,6 +528,30 @@ export class BeneficiaryRegistrationComponent implements OnInit {
         'Entendido'
       ).subscribe();
     }
+  }
+
+  /**
+   * Resetea el formulario a su estado inicial
+   */
+  private resetForm(): void {
+    this.beneficiaryForm.reset({
+      tipo_documento_codigo: '001',
+      tiene_hijos: false,
+      tiene_carnet_conadis: false,
+      tiene_certificado_discapacidad: false,
+      recibe_atencion_medica: false,
+      toma_medicamentos: false,
+      otras_personas_discapacidad: false,
+      labora_actualmente: false,
+      recibio_test_vocacional: false,
+    });
+    this.currentStep = 1;
+    this.selectedServiciosBasicos = []; // Limpiar servicios básicos
+    this.mostrarApoderado = false; // Ocultar sección de apoderado
+    this.isDisabled = true; // Volver a deshabilitar el formulario
+    this.isEditMode = false; // Desactivar modo edición
+    this.currentBeneficiaryId = null; // Limpiar ID del beneficiario
+    this.setLockedForm(true); // Bloquear formulario
   }
 
   prepareApoderadoData(): any {
@@ -513,42 +571,140 @@ export class BeneficiaryRegistrationComponent implements OnInit {
 
   onServicioBasicoChange(event: any, idServicio: number): void {
     if (event.target.checked) {
-      this.selectedServiciosBasicos.push(idServicio);
+      // Evitar duplicados
+      if (!this.selectedServiciosBasicos.includes(idServicio)) {
+        this.selectedServiciosBasicos.push(idServicio);
+      }
     } else {
       const index = this.selectedServiciosBasicos.indexOf(idServicio);
       if (index > -1) {
         this.selectedServiciosBasicos.splice(index, 1);
       }
     }
+    console.log('Servicios básicos seleccionados:', this.selectedServiciosBasicos);
+  }
+
+  /**
+   * Verifica si un servicio básico está seleccionado
+   * @param idServicio ID del servicio a verificar
+   * @returns true si el servicio está seleccionado
+   */
+  isServicioBasicoSelected(idServicio: number): boolean {
+    return this.selectedServiciosBasicos.includes(idServicio);
   }
 
   onCancel(): void {
+    const mensaje = this.isEditMode 
+      ? 'Tienes cambios sin guardar. Si cancelas, se perderán todas las modificaciones. ¿Estás seguro?'
+      : 'Tienes cambios sin guardar. Si cancelas, se perderán todos los datos ingresados. ¿Estás seguro?';
+
     this.confirmationDialogService.showConfirm(
-      '¿Cancelar Registro?',
-      'Tienes cambios sin guardar. Si cancelas, se perderán todos los datos ingresados. ¿Estás seguro?',
+      '¿Cancelar Operación?',
+      mensaje,
       'Sí, cancelar',
       'No, continuar'
     ).subscribe(confirmar => {
       if (confirmar) {
-        this.beneficiaryForm.reset({
-          tipo_documento_codigo: 'DNI',
-          tiene_hijos: false,
-          tiene_carnet_conadis: false,
-          tiene_certificado_discapacidad: false,
-          recibe_atencion_medica: false,
-          toma_medicamentos: false,
-          otras_personas_discapacidad: false,
-          labora_actualmente: false,
-          recibio_test_vocacional: false,
-          esta_registrado_omaped: true,
-        });
-        this.currentStep = 1;
+        this.resetForm();
         this.confirmationDialogService.showInfo(
-          'Registro Cancelado',
+          'Operación Cancelada',
           'El formulario ha sido limpiado correctamente.'
         ).subscribe();
       }
     });
+  }
+
+  private loadBeneficiaryData(data: BeneficiaryResponse): void {
+    // Establecer modo edición
+    this.isEditMode = true;
+    this.currentBeneficiaryId = data.idBeneficiario;
+
+    // Convertir la fecha del formato ISO al formato YYYY-MM-DD para el input date
+    const fechaNacimiento = data.fechaNacimiento ? data.fechaNacimiento.split('T')[0] : '';
+
+    this.beneficiaryForm.patchValue({
+      // Paso 1: Identidad y Datos Básicos
+      nombres_completos: data.nombresCompletos || '',
+      edad_texto: data.edad || 0,
+      tipo_documento_codigo: data.tipoDocumentoCodigo || '001',
+      numero_documento: data.numeroDocumento || '',
+      id_nacionalidad: data.idNacionalidad || '',
+      nacionalidad_otro: data.nacionalidadOtro || '',
+      sexo: data.sexo || '',
+      fecha_nacimiento: fechaNacimiento,
+      telefono: data.telefono || '',
+      correo_electronico: data.correoElectronico || '',
+
+      // Paso 2: Ubigeo y Domicilio
+      id_departamento: data.idDepartamento || '',
+      id_provincia: data.idProvincia || '',
+      id_distrito: data.idDistrito || '',
+      id_estado_civil: data.idEstadoCivil || '',
+      tiene_hijos: data.tieneHijos || false,
+      numero_hijos: data.numeroHijos,
+      direccion_actual: data.direccionActual || '',
+      referencia: data.referencia || '',
+
+      // Paso 3: Discapacidad
+      tiene_carnet_conadis: data.tieneCarnetConadis || false,
+      numero_carnet_conadis: data.numeroCarnetConadis || '',
+      tiene_certificado_discapacidad: data.tieneCertificadoDiscapacidad || false,
+      id_grado_discapacidad: data.idGradoDiscapacidad,
+      id_tipo_discapacidad: data.idTipoDiscapacidad,
+      discapacidad_otro: data.discapacidadOtro || '',
+      cie10: data.cie10 || '',
+      id_causa_discapacidad: data.idCausaDiscapacidad,
+      id_ayuda_biomecanica: data.idAyudaBiomecanica,
+
+      // Paso 4: Salud
+      recibe_atencion_medica: data.recibeAtencionMedica || false,
+      toma_medicamentos: data.tomaMedicamentos || false,
+      tratamiento: data.tratamiento || '',
+      otras_personas_discapacidad: data.otrasPersonasDiscapacidad || false,
+      cuantas_personas_discapacidad: data.cuantasPersonasDiscapacidad,
+      id_seguro: data.idSeguro,
+
+      // Paso 5: Educación y Empleo
+      labora_actualmente: data.laboraActualmente || false,
+      lugar_trabajo: data.lugarTrabajo || '',
+      funcion_desempena: data.funcionDesempena || '',
+      id_grado_instruccion: data.idGradoInstruccion,
+      centro_estudios: data.centroEstudios || '',
+      carrera: data.carrera || '',
+      idiomas: data.idiomas || '',
+      id_tipo_apoyo: data.idTipoApoyo,
+      id_actividad_deportiva: data.idActividadDeportiva,
+      recibio_test_vocacional: data.recibioTestVocacional || false,
+      test_vocacional_donde: data.testVocacionalDonde || '',
+
+      // Paso 6: Vivienda y Programas Sociales
+      id_condicion_vivienda: data.idCondicionVivienda,
+      id_tipo_vivienda: data.idTipoVivienda,
+      id_con_quien_vive: data.idConQuienVive,
+      id_programa_social: data.idProgramaSocial,
+
+      // Paso 7: Apoderado
+      apoderado_nombres: data.nombresApoderado || '',
+      apoderado_id_parentesco: data.idParentescoApoderado || null,
+      apoderado_tipo_documento: data.tipoDocumentoCodigoApoderado || '001',
+      apoderado_numero_documento: data.numeroDocumentoApoderado || '',
+      apoderado_telefono: data.telefonoApoderado || '',
+      apoderado_direccion: data.direccionApoderado || ''
+    });
+
+    // Cargar servicios básicos seleccionados
+    if (data.serviciosBasicos && Array.isArray(data.serviciosBasicos)) {
+      this.selectedServiciosBasicos = [...data.serviciosBasicos];
+      console.log('✅ Servicios básicos cargados:', this.selectedServiciosBasicos);
+    }
+
+    // Habilitar el formulario para permitir la edición
+    this.isDisabled = false;
+    this.setLockedForm(false);
+
+    this.mostrarApoderado = data.idParentescoApoderado ? true : false;
+    
+    console.log('✅ Datos del beneficiario cargados en el formulario');
   }
 
   private markAllAsTouched(): void {

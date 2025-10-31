@@ -230,7 +230,7 @@
 
         <!-- Edad (texto opcional) -->
         <div class="form-field">
-          <label for="edad_texto">Edad (opcional)</label>
+          <label for="edad_texto">Edad</label>
           <input
             type="text"
             id="edad_texto"
@@ -1236,6 +1236,8 @@
               <input
                 type="checkbox"
                 [value]="servicio.id"
+                [checked]="selectedServiciosBasicos.includes(servicio.id)"
+                [disabled]="isDisabled"
                 (change)="onServicioBasicoChange($event, servicio.id)"
               />
               <span>{{ servicio.nombre }}</span>
@@ -1298,7 +1300,7 @@
         *ngIf="currentStep === totalSteps"
          [disabled]="isDisabled"
       >
-        Guardar Registro
+        {{ isEditMode ? 'Actualizar Registro' : 'Guardar Registro' }}
       </button>
     </div>
   </form>
