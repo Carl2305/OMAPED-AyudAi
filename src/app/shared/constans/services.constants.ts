@@ -5,6 +5,7 @@ import { LoadingSpinnerService } from '@shared/utils/services/loading-spinner/lo
 import { KeyboardVirtualService } from '@shared/utils/services/keyboard-virtual/keyboard-virtual.service';
 import { CodeCaptchaService } from '@shared/utils/services/code-captcha/code-captcha.service';
 import { ConfirmationDialogService } from '@shared/utils/services/confirmation-dialog/confirmation-dialog.service';
+import { ExcelExportService } from '@shared/utils/services/excel-export/excel-export.service';
 
 export const SERVICES = [
   RandomNumberService,
@@ -14,6 +15,7 @@ export const SERVICES = [
   AuditLoggerService,
   SecureStorageService,
   ConfirmationDialogService,
+  ExcelExportService  
   // ErrorHandlerService,
   // NotificationService,
   // ValidationService,

@@ -32,6 +32,45 @@
             </option>
           </select>
         </div>
+
+        <!-- Export Buttons -->
+        <div class="export-controls">
+          <!-- Export Current Page -->
+          <button 
+            class="btn-export btn-export-current"
+            (click)="exportCurrentPageToExcel()"
+            [disabled]="isLoading || isExporting || beneficiaries.length === 0"
+            title="Exportar página actual a Excel"
+            type="button"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+            <span class="btn-text">Exportar página</span>
+          </button>
+
+          <!-- Export All -->
+          <button 
+            class="btn-export btn-export-all"
+            (click)="exportAllToExcel()"
+            [disabled]="isLoading || isExporting || totalCount === 0"
+            title="Exportar todos los beneficiarios a Excel"
+            type="button"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" *ngIf="!isExporting">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <div class="spinner-small" *ngIf="isExporting"></div>
+            <span class="btn-text">{{ isExporting ? 'Exportando...' : 'Exportar todo' }}</span>
+          </button>
+        </div>
       </div>
     </div>
 
