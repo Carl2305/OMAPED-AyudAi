@@ -124,7 +124,7 @@
   background: white;
 
   @media (max-width: 1024px) {
-    background: linear-gradient(135deg, #E86677 0%, #E40521 50%);
+    background: linear-gradient(135deg, var(--color-azul-claro) 0%, var(--color-azul-principal) 50%);
   }
 }
 

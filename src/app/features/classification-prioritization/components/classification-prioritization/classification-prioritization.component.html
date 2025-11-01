@@ -1,1 +1,218 @@
-<p>classification-prioritization works!</p>
+<!-- Main Content -->
+<main class="main-content">
+  <!-- Title Card -->
+  <div class="title-card">
+    <h2>Clasificación y Priorización de Beneficiarios</h2>
+    <p>
+      Gestione y priorice los beneficiarios registrados en el sistema OMAPED.
+    </p>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-card">
+    <!-- Table Header with Controls -->
+    <div class="table-header">
+      <div class="table-info">
+        <h3>Lista de Beneficiarios</h3>
+        <span class="total-count">{{ totalCount }} registros en total</span>
+      </div>
+      
+      <div class="table-controls">
+        <!-- Page Size Selector -->
+        <div class="page-size-control">
+          <label for="pageSize">Mostrar:</label>
+          <select 
+            id="pageSize" 
+            [value]="pageSize" 
+            (change)="changePageSize($event)"
+            [disabled]="isLoading"
+          >
+            <option *ngFor="let size of pageSizeOptions" [value]="size">
+              {{ size }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-container" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Cargando beneficiarios...</p>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage && !isLoading">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ errorMessage }}</span>
+      <button class="retry-btn" (click)="loadBeneficiaries()">Reintentar</button>
+    </div>
+
+    <!-- Table Container -->
+    <div class="table-container" *ngIf="!isLoading && !errorMessage">
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="beneficiaries.length === 0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 11l3 3L22 4"></path>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
+        <h3>No hay beneficiarios registrados</h3>
+        <p>Aún no se han encontrado beneficiarios en el sistema.</p>
+      </div>
+
+      <!-- Table -->
+      <table class="beneficiaries-table" *ngIf="beneficiaries.length > 0">
+        <thead>
+          <tr>
+            <th>Tipo Doc.</th>
+            <th>Número Documento</th>
+            <th>Nombre Completo</th>
+            <th>Tipo de Discapacidad</th>
+            <th>Edad</th>
+            <th>Servicios Básicos</th>
+            <th class="actions-column">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let beneficiary of beneficiaries">
+            <td>
+              <span class="doc-type-badge">{{ beneficiary.tipoDocumento }}</span>
+            </td>
+            <td>
+              <span class="doc-number">{{ beneficiary.numeroDocumento }}</span>
+            </td>
+            <td>
+              <span class="beneficiary-name">{{ beneficiary.nombreCompleto }}</span>
+            </td>
+            <td>
+              <span class="disability-badge">{{ beneficiary.tipoDiscapacidad }}</span>
+            </td>
+            <td>
+              <span class="age">{{ beneficiary.edad }} años</span>
+            </td>
+            <td>
+              <span class="services" *ngIf="beneficiary.serviciosBasicos; else noServices">
+                {{ beneficiary.serviciosBasicos }}
+              </span>
+              <ng-template #noServices>
+                <span class="no-data">-</span>
+              </ng-template>
+            </td>
+            <td class="actions-column">
+              <div class="action-buttons">
+                <button 
+                  class="btn-action btn-view" 
+                  title="Ver detalles"
+                  type="button"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+                <button 
+                  class="btn-action btn-edit" 
+                  title="Editar"
+                  type="button"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                </button>
+                <button 
+                  class="btn-action btn-priority" 
+                  title="Clasificar prioridad"
+                  type="button"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container" *ngIf="!isLoading && beneficiaries.length > 0">
+      <div class="pagination-info">
+        <span>Mostrando {{ getDisplayRange() }}</span>
+      </div>
+
+      <div class="pagination-controls">
+        <!-- Previous Button -->
+        <button 
+          class="pagination-btn"
+          [disabled]="!hasPreviousPage"
+          (click)="previousPage()"
+          type="button"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          Anterior
+        </button>
+
+        <!-- Page Numbers -->
+        <div class="page-numbers">
+          <!-- First Page -->
+          <button 
+            *ngIf="getPageNumbers()[0] > 1"
+            class="page-number"
+            (click)="goToPage(1)"
+            type="button"
+          >
+            1
+          </button>
+          
+          <!-- Ellipsis Start -->
+          <span class="ellipsis" *ngIf="getPageNumbers()[0] > 2">...</span>
+          
+          <!-- Page Buttons -->
+          <button 
+            *ngFor="let page of getPageNumbers()"
+            class="page-number"
+            [class.active]="page === currentPage"
+            (click)="goToPage(page)"
+            type="button"
+          >
+            {{ page }}
+          </button>
+          
+          <!-- Ellipsis End -->
+          <span class="ellipsis" *ngIf="getPageNumbers()[getPageNumbers().length - 1] < totalPages - 1">...</span>
+          
+          <!-- Last Page -->
+          <button 
+            *ngIf="getPageNumbers()[getPageNumbers().length - 1] < totalPages"
+            class="page-number"
+            (click)="goToPage(totalPages)"
+            type="button"
+          >
+            {{ totalPages }}
+          </button>
+        </div>
+
+        <!-- Next Button -->
+        <button 
+          class="pagination-btn"
+          [disabled]="!hasNextPage"
+          (click)="nextPage()"
+          type="button"
+        >
+          Siguiente
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
