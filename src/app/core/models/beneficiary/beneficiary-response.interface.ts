@@ -37,6 +37,7 @@ export interface BeneficiaryResponse {
   testVocacionalDonde: string;
   laboraActualmente: boolean;
   lugarTrabajo: string;
+  idRangoSalarial: number;
   funcionDesempena: string;
   idGradoInstruccion: number;
   centroEstudios: string;

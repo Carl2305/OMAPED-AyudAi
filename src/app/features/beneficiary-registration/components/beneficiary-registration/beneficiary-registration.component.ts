@@ -42,8 +42,7 @@ export class BeneficiaryRegistrationComponent implements OnInit {
 
   generos = [
     { value: 'MASCULINO', label: 'Masculino' },
-    { value: 'FEMENINO', label: 'Femenino' },
-    { value: 'NO_DECLARA', label: 'Prefiero no decir' },
+    { value: 'FEMENINO', label: 'Femenino' }
   ];
 
   estadosCiviles = [
@@ -111,6 +110,13 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     { id: 7, nombre: 'Superior técnica completa' },
     { id: 8, nombre: 'Superior universitaria incompleta' },
     { id: 9, nombre: 'Superior universitaria completa' },
+  ];
+
+  rango_salariales = [
+    { id: 1, nombre: '0 - 1500' },
+    { id: 2, nombre: '1501 - 2500' },
+    { id: 3, nombre: '2501 - 3500' },
+    { id: 4, nombre: 'Más de 3500' }
   ];
 
   tiposApoyo = [
@@ -246,6 +252,7 @@ export class BeneficiaryRegistrationComponent implements OnInit {
       // 🟦 PASO 5: EDUCACIÓN Y TRABAJO
       labora_actualmente: [false],
       lugar_trabajo: [''],
+      id_rango_salarial: [null],
       funcion_desempena: [''],
       id_grado_instruccion: [null],
       centro_estudios: [''],
@@ -322,15 +329,19 @@ export class BeneficiaryRegistrationComponent implements OnInit {
       ?.valueChanges.subscribe((value) => {
         const lugarControl = this.beneficiaryForm.get('lugar_trabajo');
         const funcionControl = this.beneficiaryForm.get('funcion_desempena');
+        const rangoSalarialControl = this.beneficiaryForm.get('id_rango_salarial');
         if (value) {
           lugarControl?.setValidators(Validators.required);
           funcionControl?.setValidators(Validators.required);
+          rangoSalarialControl?.setValidators(Validators.required);
         } else {
           lugarControl?.clearValidators();
           funcionControl?.clearValidators();
+          rangoSalarialControl?.clearValidators();
         }
         lugarControl?.updateValueAndValidity();
         funcionControl?.updateValueAndValidity();
+        rangoSalarialControl?.updateValueAndValidity();
       });
 
     // Si marca que necesita apoderado, validar campos del apoderado
@@ -346,7 +357,7 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     'discapacidad_otro', 'id_causa_discapacidad', 'id_ayuda_biomecanica', 'recibe_atencion_medica', 'toma_medicamentos', 
     'tratamiento', 'otras_personas_discapacidad', 'cuantas_personas_discapacidad', 'id_seguro', 'id_grado_instruccion', 
     'centro_estudios', 'carrera', 'idiomas', 'recibio_test_vocacional',  'test_vocacional_donde', 'labora_actualmente', 
-    'lugar_trabajo', 'funcion_desempena', 'id_tipo_apoyo', 'id_actividad_deportiva', 'id_condicion_vivienda', 'id_tipo_vivienda', 
+    'lugar_trabajo', 'id_rango_salarial', 'funcion_desempena', 'id_tipo_apoyo', 'id_actividad_deportiva', 'id_condicion_vivienda', 'id_tipo_vivienda', 
     'id_con_quien_vive', 'id_programa_social', 'cie10'
     ];
 
@@ -667,6 +678,7 @@ export class BeneficiaryRegistrationComponent implements OnInit {
       // Paso 5: Educación y Empleo
       labora_actualmente: data.laboraActualmente || false,
       lugar_trabajo: data.lugarTrabajo || '',
+      id_rango_salarial: data.idRangoSalarial || null,
       funcion_desempena: data.funcionDesempena || '',
       id_grado_instruccion: data.idGradoInstruccion,
       centro_estudios: data.centroEstudios || '',

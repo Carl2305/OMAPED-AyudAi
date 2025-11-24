@@ -1027,6 +1027,33 @@
           />
         </div>
 
+        <!-- Rango Salarial (condicional) -->
+        <div 
+          class="form-field" 
+          *ngIf="beneficiaryForm.get('labora_actualmente')?.value">
+          <label for="id_rango_salarial">Rango Salarial (S/.) <span class="required">*</span></label>
+          <div class="select-wrapper">
+            <select id="id_rango_salarial" formControlName="id_rango_salarial">
+              <option [value]="null">Seleccione rango salarial</option>
+              <option *ngFor="let salario of rango_salariales" [value]="salario.id">
+                {{ salario.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
         <!-- Función que Desempeña (condicional) -->
         <div
           class="form-field full-width"
