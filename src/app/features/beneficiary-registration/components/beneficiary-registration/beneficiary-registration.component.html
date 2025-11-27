@@ -698,6 +698,34 @@
           </div>
         </div>
 
+        <!-- Grado de dependencia -->
+        <div class="form-field">
+          <label for="id_grado_dependencia">Grado de Dependencia</label>
+          <div class="select-wrapper">
+            <select
+              id="id_grado_dependencia"
+              formControlName="id_grado_dependencia"
+            >
+              <option [value]="null">Seleccione grado</option>
+              <option *ngFor="let tipo of gradosDependencia" [value]="tipo.id">
+                {{ tipo.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
         <!-- Tipo de Discapacidad -->
         <div class="form-field">
           <label for="id_tipo_discapacidad">Tipo de Discapacidad</label>

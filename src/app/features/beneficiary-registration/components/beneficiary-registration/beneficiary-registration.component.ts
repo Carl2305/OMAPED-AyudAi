@@ -73,6 +73,12 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     { id: 4, nombre: 'Muy Grave' },
   ];
 
+  gradosDependencia = [
+    { id: 1, nombre: 'Autónomo' },
+    { id: 2, nombre: 'Apoyo Parcial' },
+    { id: 3, nombre: 'Apoyo Permanente' },
+  ];
+
   tiposDiscapacidad = [
     { id: 1, nombre: 'Física o motora' },
     { id: 2, nombre: 'Visual' },
@@ -235,6 +241,7 @@ export class BeneficiaryRegistrationComponent implements OnInit {
       numero_carnet_conadis: [''],
       tiene_certificado_discapacidad: [false, Validators.required],
       id_grado_discapacidad: [null],
+      id_grado_dependencia: [null],
       id_tipo_discapacidad: [null],
       discapacidad_otro: [''],
       cie10: [''],
@@ -353,11 +360,11 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     'edad_texto', 'telefono', 'correo_electronico', 'id_departamento', 'id_provincia', 'id_distrito', 'id_estado_civil',
     'tiene_hijos', 'numero_hijos', 'direccion_actual', 'referencia', 'apoderado_nombres', 'apoderado_id_parentesco', 
     'apoderado_tipo_documento', 'tiene_carnet_conadis', 'apoderado_numero_documento', 'apoderado_telefono', 'apoderado_direccion',
-    'tiene_carnet_conadis', 'numero_carnet_conadis', 'tiene_certificado_discapacidad', 'id_grado_discapacidad', 'id_tipo_discapacidad', 
-    'discapacidad_otro', 'id_causa_discapacidad', 'id_ayuda_biomecanica', 'recibe_atencion_medica', 'toma_medicamentos', 
-    'tratamiento', 'otras_personas_discapacidad', 'cuantas_personas_discapacidad', 'id_seguro', 'id_grado_instruccion', 
-    'centro_estudios', 'carrera', 'idiomas', 'recibio_test_vocacional',  'test_vocacional_donde', 'labora_actualmente', 
-    'lugar_trabajo', 'id_rango_salarial', 'funcion_desempena', 'id_tipo_apoyo', 'id_actividad_deportiva', 'id_condicion_vivienda', 'id_tipo_vivienda', 
+    'tiene_carnet_conadis', 'numero_carnet_conadis', 'tiene_certificado_discapacidad', 'id_grado_dependencia', 'id_grado_discapacidad', 
+    'id_tipo_discapacidad', 'discapacidad_otro', 'id_causa_discapacidad', 'id_ayuda_biomecanica', 'recibe_atencion_medica', 
+    'toma_medicamentos', 'tratamiento', 'otras_personas_discapacidad', 'cuantas_personas_discapacidad', 'id_seguro', 'id_grado_instruccion', 
+    'centro_estudios', 'carrera', 'idiomas', 'recibio_test_vocacional',  'test_vocacional_donde', 'labora_actualmente', 'lugar_trabajo', 
+    'id_rango_salarial', 'funcion_desempena', 'id_tipo_apoyo', 'id_actividad_deportiva', 'id_condicion_vivienda', 'id_tipo_vivienda', 
     'id_con_quien_vive', 'id_programa_social', 'cie10'
     ];
 
@@ -661,6 +668,7 @@ export class BeneficiaryRegistrationComponent implements OnInit {
       numero_carnet_conadis: data.numeroCarnetConadis || '',
       tiene_certificado_discapacidad: data.tieneCertificadoDiscapacidad || false,
       id_grado_discapacidad: data.idGradoDiscapacidad,
+      id_grado_dependencia: data.idGradoDependencia,
       id_tipo_discapacidad: data.idTipoDiscapacidad,
       discapacidad_otro: data.discapacidadOtro || '',
       cie10: data.cie10 || '',
