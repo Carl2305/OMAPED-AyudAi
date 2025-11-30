@@ -16,6 +16,36 @@
         <h3>Lista de Beneficiarios</h3>
         <span class="total-count">{{ totalCount }} registros en total</span>
       </div>
+
+      <!-- Search Input -->
+      <div class="search-control">
+        <div class="search-input-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Buscar por número de documento..."
+            [(ngModel)]="searchDocument"
+            (input)="onSearchChange()"
+            [disabled]="isLoading"
+          />
+          <button 
+            *ngIf="searchDocument" 
+            class="clear-search-btn" 
+            (click)="clearSearch()"
+            type="button"
+            title="Limpiar búsqueda"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
       
       <div class="table-controls">
         <!-- Page Size Selector -->
@@ -172,6 +202,17 @@
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                   </svg>
                 </button>
+                <button 
+                  class="btn-action btn-history" 
+                  title="Ver bitácora de cambios"
+                  type="button"
+                  (click)="openAuditHistory(beneficiary)"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </button>
               </div>
             </td>
           </tr>
@@ -255,3 +296,11 @@
     </div>
   </div>
 </main>
+
+<!-- Modal de Bitácora de Cambios -->
+<app-audit-history-modal
+  *ngIf="showAuditModal"
+  [beneficiaryId]="selectedBeneficiaryId!"
+  [beneficiaryName]="selectedBeneficiaryName"
+  (closeModal)="closeAuditModal()"
+></app-audit-history-modal>

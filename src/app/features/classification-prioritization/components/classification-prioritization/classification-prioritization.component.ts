@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ClassificationPrioritizationService } from '@features/classification-prioritization/services/classification-prioritization.service';
 import { BeneficiaryListItem, PagedResponse } from '@core/models/beneficiary/beneficiary-list-item.interface';
 import { ExcelExportService } from '@shared/utils/services/excel-export/excel-export.service';
+import { AuditHistoryModalComponent } from './modals/audit-history-modal/audit-history-modal.component';
 
 @Component({
   selector: 'app-classification-prioritization',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, AuditHistoryModalComponent],
   templateUrl: './classification-prioritization.component.html',
   styleUrl: './classification-prioritization.component.scss'
 })
@@ -27,6 +29,15 @@ export class ClassificationPrioritizationComponent implements OnInit {
   isLoading: boolean = false;
   isExporting: boolean = false;
   errorMessage: string = '';
+  
+  // Búsqueda
+  searchDocument: string = '';
+  private searchTimeout: any;
+  
+  // Modal de auditoría
+  showAuditModal: boolean = false;
+  selectedBeneficiaryId: number | null = null;
+  selectedBeneficiaryName: string = '';
   
   // Opciones de tamaño de página
   pageSizeOptions: number[] = [10, 20, 50, 100];
@@ -55,10 +66,20 @@ export class ClassificationPrioritizationComponent implements OnInit {
 
       if (response.success && response.data) {
         const pagedData = response.data;
-        this.beneficiaries = pagedData.items;
+        
+        // Aplicar filtro local por número de documento si existe búsqueda
+        let filteredItems = pagedData.items;
+        if (this.searchDocument && this.searchDocument.trim() !== '') {
+          const searchTerm = this.searchDocument.trim().toLowerCase();
+          filteredItems = pagedData.items.filter(beneficiary => 
+            beneficiary.numeroDocumento.toLowerCase().includes(searchTerm)
+          );
+        }
+        
+        this.beneficiaries = filteredItems;
         this.currentPage = pagedData.pageNumber;
         this.pageSize = pagedData.pageSize;
-        this.totalCount = pagedData.totalCount;
+        this.totalCount = this.searchDocument ? filteredItems.length : pagedData.totalCount;
         this.totalPages = pagedData.totalPages;
         this.hasPreviousPage = pagedData.hasPreviousPage;
         this.hasNextPage = pagedData.hasNextPage;
@@ -107,7 +128,32 @@ export class ClassificationPrioritizationComponent implements OnInit {
   changePageSize(event: Event): void {
     const select = event.target as HTMLSelectElement;
     this.pageSize = parseInt(select.value, 10);
-    this.currentPage = 1; // Volver a la primera página
+    this.currentPage = 1; // Reset a la primera página
+    this.loadBeneficiaries();
+  }
+
+  /**
+   * Maneja el cambio en el input de búsqueda con debounce
+   */
+  onSearchChange(): void {
+    // Limpiar el timeout anterior
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+
+    // Establecer un nuevo timeout para buscar después de 500ms
+    this.searchTimeout = setTimeout(() => {
+      this.currentPage = 1; // Reset a la primera página al buscar
+      this.loadBeneficiaries();
+    }, 500);
+  }
+
+  /**
+   * Limpia la búsqueda
+   */
+  clearSearch(): void {
+    this.searchDocument = '';
+    this.currentPage = 1;
     this.loadBeneficiaries();
   }
 
@@ -229,5 +275,23 @@ export class ClassificationPrioritizationComponent implements OnInit {
     } finally {
       this.isExporting = false;
     }
+  }
+
+  /**
+   * Abre el modal de bitácora de cambios
+   */
+  openAuditHistory(beneficiary: BeneficiaryListItem): void {
+    this.selectedBeneficiaryId = beneficiary.idBeneficiario;
+    this.selectedBeneficiaryName = beneficiary.nombreCompleto;
+    this.showAuditModal = true;
+  }
+
+  /**
+   * Cierra el modal de bitácora de cambios
+   */
+  closeAuditModal(): void {
+    this.showAuditModal = false;
+    this.selectedBeneficiaryId = null;
+    this.selectedBeneficiaryName = '';
   }
 }

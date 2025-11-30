@@ -259,6 +259,20 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08),
     &::placeholder {
       color: #9ca3af;
     }
+
+    // Estilos para campos deshabilitados
+    &:disabled,
+    &[disabled] {
+      background-color: #f9fafb;
+      color: #6b7280;
+      cursor: not-allowed;
+      border-color: #e5e7eb;
+      opacity: 0.7;
+
+      &::placeholder {
+        color: #d1d5db;
+      }
+    }
   }
 
   .input-with-button {
@@ -308,6 +322,16 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08),
       &.invalid {
         border-color: $error-color;
         background-color: #fef2f2;
+      }
+
+      // Estilos para selects deshabilitados
+      &:disabled,
+      &[disabled] {
+        background-color: #f9fafb;
+        color: #6b7280;
+        cursor: not-allowed;
+        border-color: #e5e7eb;
+        opacity: 0.7;
       }
     }
 
@@ -421,6 +445,16 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08),
 
   &:active:not(:disabled) {
     transform: translateY(0);
+  }
+
+  // Estilos para botones deshabilitados
+  &:disabled,
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #e5e7eb;
+    color: #9ca3af;
+    border-color: #d1d5db;
   }
 }
 

@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '@environments/environment';
 import { ApiResponse } from '@core/models/response/api-response-base.module';
 import { BeneficiaryListItem, PagedResponse } from '@core/models/beneficiary/beneficiary-list-item.interface';
+import { AuditHistoryItem } from '@core/models/audit/audit-history.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClassificationPrioritizationService {
   private readonly apiUrl = `${environment.apiUrl}/beneficiario`;
+  private readonly auditUrl = `${environment.apiUrl}/auditoria`;
 
   constructor(private http: HttpClient) { }
 
@@ -36,6 +38,28 @@ export class ClassificationPrioritizationService {
       );
     } catch (error) {
       console.error('Error al obtener beneficiarios paginados:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtiene el historial de auditoría de un beneficiario
+   * @param beneficiaryId ID del beneficiario
+   * @returns Promise con el historial de cambios
+   */
+  async getAuditHistory(beneficiaryId: number): Promise<ApiResponse<AuditHistoryItem[]>> {
+    try {
+      const response = await firstValueFrom(
+        this.http.get<ApiResponse<AuditHistoryItem[]>>(`${this.auditUrl}/${beneficiaryId}`, {
+          observe: 'response',
+          responseType: 'json'
+        })
+      );
+
+      const body = response.body!;
+      return body;
+    } catch (error) {
+      console.error('Error al obtener historial de auditoría:', error);
       throw error;
     }
   }

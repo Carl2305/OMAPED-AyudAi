@@ -1,4 +1,5 @@
 export interface BeneficiaryListItem {
+  idBeneficiario: number;
   tipoDocumento: string;
   numeroDocumento: string;
   nombreCompleto: string;
