@@ -23,6 +23,7 @@ export interface BeneficiaryResponse {
   numeroCarnetConadis: string;
   tieneCertificadoDiscapacidad: boolean;
   idGradoDiscapacidad: number;
+  idGradoDependencia: number;
   idTipoDiscapacidad: number;
   discapacidadOtro: string;
   cie10: string;
@@ -37,6 +38,7 @@ export interface BeneficiaryResponse {
   testVocacionalDonde: string;
   laboraActualmente: boolean;
   lugarTrabajo: string;
+  idRangoSalarial: number;
   funcionDesempena: string;
   idGradoInstruccion: number;
   centroEstudios: string;

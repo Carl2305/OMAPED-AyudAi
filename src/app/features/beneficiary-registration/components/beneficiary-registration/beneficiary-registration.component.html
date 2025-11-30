@@ -109,7 +109,11 @@
                 numero_documento?.invalid && numero_documento?.touched
               "
             />
-            <button type="button" class="btn-secondary" (click)="validateExistsBeneficiary()">
+            <button 
+              type="button" 
+              class="btn-secondary" 
+              (click)="validateExistsBeneficiary()"
+            >
               Buscar
             </button>
           </div>
@@ -698,6 +702,34 @@
           </div>
         </div>
 
+        <!-- Grado de dependencia -->
+        <div class="form-field">
+          <label for="id_grado_dependencia">Grado de Dependencia</label>
+          <div class="select-wrapper">
+            <select
+              id="id_grado_dependencia"
+              formControlName="id_grado_dependencia"
+            >
+              <option [value]="null">Seleccione grado</option>
+              <option *ngFor="let tipo of gradosDependencia" [value]="tipo.id">
+                {{ tipo.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
         <!-- Tipo de Discapacidad -->
         <div class="form-field">
           <label for="id_tipo_discapacidad">Tipo de Discapacidad</label>
@@ -1025,6 +1057,33 @@
             formControlName="lugar_trabajo"
             placeholder="Nombre de la empresa o institución"
           />
+        </div>
+
+        <!-- Rango Salarial (condicional) -->
+        <div 
+          class="form-field" 
+          *ngIf="beneficiaryForm.get('labora_actualmente')?.value">
+          <label for="id_rango_salarial">Rango Salarial (S/.) <span class="required">*</span></label>
+          <div class="select-wrapper">
+            <select id="id_rango_salarial" formControlName="id_rango_salarial">
+              <option [value]="null">Seleccione rango salarial</option>
+              <option *ngFor="let salario of rango_salariales" [value]="salario.id">
+                {{ salario.nombre }}
+              </option>
+            </select>
+            <svg
+              class="select-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
         </div>
 
         <!-- Función que Desempeña (condicional) -->

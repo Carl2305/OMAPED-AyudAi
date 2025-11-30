@@ -9,6 +9,7 @@ import {
 import { BeneficiaryRegistrationService } from '@features/beneficiary-registration/services/beneficiary-registration.service';
 import { ConfirmationDialogService } from '@shared/utils/services/confirmation-dialog/confirmation-dialog.service';
 import { BeneficiaryResponse } from '@core/models/beneficiary/beneficiary-response.interface';
+import { AuditService } from '@core/services/audit/audit.service';
 
 @Component({
   selector: 'app-beneficiary-registration',
@@ -24,6 +25,7 @@ export class BeneficiaryRegistrationComponent implements OnInit {
   isDisabled: boolean = true;
   isEditMode: boolean = false; // Indica si estamos editando un beneficiario existente
   currentBeneficiaryId: number | null = null; // ID del beneficiario en modo edición
+  originalBeneficiaryData: any = null; // Almacena los datos originales para auditoría
 
   //#region  data static
   // Catálogos según BD - Estos vendrán del backend
@@ -42,8 +44,7 @@ export class BeneficiaryRegistrationComponent implements OnInit {
 
   generos = [
     { value: 'MASCULINO', label: 'Masculino' },
-    { value: 'FEMENINO', label: 'Femenino' },
-    { value: 'NO_DECLARA', label: 'Prefiero no decir' },
+    { value: 'FEMENINO', label: 'Femenino' }
   ];
 
   estadosCiviles = [
@@ -72,6 +73,12 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     { id: 2, nombre: 'Moderado' },
     { id: 3, nombre: 'Grave' },
     { id: 4, nombre: 'Muy Grave' },
+  ];
+
+  gradosDependencia = [
+    { id: 1, nombre: 'Autónomo' },
+    { id: 2, nombre: 'Apoyo Parcial' },
+    { id: 3, nombre: 'Apoyo Permanente' },
   ];
 
   tiposDiscapacidad = [
@@ -111,6 +118,13 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     { id: 7, nombre: 'Superior técnica completa' },
     { id: 8, nombre: 'Superior universitaria incompleta' },
     { id: 9, nombre: 'Superior universitaria completa' },
+  ];
+
+  rango_salariales = [
+    { id: 1, nombre: '0 - 1500' },
+    { id: 2, nombre: '1501 - 2500' },
+    { id: 3, nombre: '2501 - 3500' },
+    { id: 4, nombre: 'Más de 3500' }
   ];
 
   tiposApoyo = [
@@ -193,7 +207,8 @@ export class BeneficiaryRegistrationComponent implements OnInit {
   constructor(
     private fb: FormBuilder, 
     private beneficiaryRegistrationService: BeneficiaryRegistrationService,
-    private confirmationDialogService: ConfirmationDialogService
+    private confirmationDialogService: ConfirmationDialogService,
+    private auditService: AuditService
   ) {}
 
   ngOnInit(): void {
@@ -229,6 +244,7 @@ export class BeneficiaryRegistrationComponent implements OnInit {
       numero_carnet_conadis: [''],
       tiene_certificado_discapacidad: [false, Validators.required],
       id_grado_discapacidad: [null],
+      id_grado_dependencia: [null],
       id_tipo_discapacidad: [null],
       discapacidad_otro: [''],
       cie10: [''],
@@ -246,6 +262,7 @@ export class BeneficiaryRegistrationComponent implements OnInit {
       // 🟦 PASO 5: EDUCACIÓN Y TRABAJO
       labora_actualmente: [false],
       lugar_trabajo: [''],
+      id_rango_salarial: [null],
       funcion_desempena: [''],
       id_grado_instruccion: [null],
       centro_estudios: [''],
@@ -322,15 +339,19 @@ export class BeneficiaryRegistrationComponent implements OnInit {
       ?.valueChanges.subscribe((value) => {
         const lugarControl = this.beneficiaryForm.get('lugar_trabajo');
         const funcionControl = this.beneficiaryForm.get('funcion_desempena');
+        const rangoSalarialControl = this.beneficiaryForm.get('id_rango_salarial');
         if (value) {
           lugarControl?.setValidators(Validators.required);
           funcionControl?.setValidators(Validators.required);
+          rangoSalarialControl?.setValidators(Validators.required);
         } else {
           lugarControl?.clearValidators();
           funcionControl?.clearValidators();
+          rangoSalarialControl?.clearValidators();
         }
         lugarControl?.updateValueAndValidity();
         funcionControl?.updateValueAndValidity();
+        rangoSalarialControl?.updateValueAndValidity();
       });
 
     // Si marca que necesita apoderado, validar campos del apoderado
@@ -342,11 +363,11 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     'edad_texto', 'telefono', 'correo_electronico', 'id_departamento', 'id_provincia', 'id_distrito', 'id_estado_civil',
     'tiene_hijos', 'numero_hijos', 'direccion_actual', 'referencia', 'apoderado_nombres', 'apoderado_id_parentesco', 
     'apoderado_tipo_documento', 'tiene_carnet_conadis', 'apoderado_numero_documento', 'apoderado_telefono', 'apoderado_direccion',
-    'tiene_carnet_conadis', 'numero_carnet_conadis', 'tiene_certificado_discapacidad', 'id_grado_discapacidad', 'id_tipo_discapacidad', 
-    'discapacidad_otro', 'id_causa_discapacidad', 'id_ayuda_biomecanica', 'recibe_atencion_medica', 'toma_medicamentos', 
-    'tratamiento', 'otras_personas_discapacidad', 'cuantas_personas_discapacidad', 'id_seguro', 'id_grado_instruccion', 
-    'centro_estudios', 'carrera', 'idiomas', 'recibio_test_vocacional',  'test_vocacional_donde', 'labora_actualmente', 
-    'lugar_trabajo', 'funcion_desempena', 'id_tipo_apoyo', 'id_actividad_deportiva', 'id_condicion_vivienda', 'id_tipo_vivienda', 
+    'tiene_carnet_conadis', 'numero_carnet_conadis', 'tiene_certificado_discapacidad', 'id_grado_dependencia', 'id_grado_discapacidad', 
+    'id_tipo_discapacidad', 'discapacidad_otro', 'id_causa_discapacidad', 'id_ayuda_biomecanica', 'recibe_atencion_medica', 
+    'toma_medicamentos', 'tratamiento', 'otras_personas_discapacidad', 'cuantas_personas_discapacidad', 'id_seguro', 'id_grado_instruccion', 
+    'centro_estudios', 'carrera', 'idiomas', 'recibio_test_vocacional',  'test_vocacional_donde', 'labora_actualmente', 'lugar_trabajo', 
+    'id_rango_salarial', 'funcion_desempena', 'id_tipo_apoyo', 'id_actividad_deportiva', 'id_condicion_vivienda', 'id_tipo_vivienda', 
     'id_con_quien_vive', 'id_programa_social', 'cie10'
     ];
 
@@ -384,7 +405,10 @@ export class BeneficiaryRegistrationComponent implements OnInit {
 
   async validateExistsBeneficiary(): Promise<void> {
 
-    if (this.beneficiaryForm.value.tipo_documento_codigo === '') {
+    const tipoDocumento = this.beneficiaryForm.get('tipo_documento_codigo')?.value;
+    const numeroDocumento = this.beneficiaryForm.get('numero_documento')?.value;
+
+    if (tipoDocumento === '') {
       this.confirmationDialogService.showWarning(
         'Tipo de Documento Requerido',
         'Por favor seleccione un tipo de documento antes de buscar.'
@@ -402,8 +426,8 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     }
 
     const response = await this.beneficiaryRegistrationService.getValidateExistsBeneficiary(
-      this.beneficiaryForm.value.tipo_documento_codigo,
-      this.beneficiaryForm.value.numero_documento
+      tipoDocumento,
+      numeroDocumento
     );
 
     if (response.data) {
@@ -416,10 +440,13 @@ export class BeneficiaryRegistrationComponent implements OnInit {
       ).subscribe(async (cargarDatos) => {
         if (cargarDatos) {
           try {
+            const tipoDocumento = this.beneficiaryForm.get('tipo_documento_codigo')?.value;
+            const numeroDocumento = this.beneficiaryForm.get('numero_documento')?.value;
+            
             // Obtener los datos completos del beneficiario
             const beneficiaryResponse = await this.beneficiaryRegistrationService.getBeneficiaryByDocument(
-              this.beneficiaryForm.value.tipo_documento_codigo,
-              this.beneficiaryForm.value.numero_documento
+              tipoDocumento,
+              numeroDocumento
             );
 
             if (beneficiaryResponse.data) {
@@ -446,12 +473,28 @@ export class BeneficiaryRegistrationComponent implements OnInit {
         }
       });
     } else {
-      // El beneficiario no existe - informar y permitir continuar con el registro
+      // El beneficiario no existe - informar y resetear formulario para nuevo registro
       this.confirmationDialogService.showInfo(
         'Nuevo Registro',
         'El beneficiario no existe en el sistema. Puede continuar con el registro.',
         'Continuar'
-      ).subscribe();
+      ).subscribe(() => {
+        // Resetear formulario manteniendo tipo y número de documento
+        const tipoDoc = this.beneficiaryForm.get('tipo_documento_codigo')?.value;
+        const numDoc = this.beneficiaryForm.get('numero_documento')?.value;
+        
+        this.resetForm();
+        
+        // Restaurar valores de documento para el nuevo registro
+        this.beneficiaryForm.patchValue({
+          tipo_documento_codigo: tipoDoc,
+          numero_documento: numDoc
+        });
+        
+        // Habilitar formulario para nuevo registro
+        this.isDisabled = false;
+        this.setLockedForm(false);
+      });
     }
     this.isDisabled = response.data!;
     this.setLockedForm(this.isDisabled);
@@ -464,13 +507,14 @@ export class BeneficiaryRegistrationComponent implements OnInit {
   async onSubmit(): Promise<void> {
     console.log(this.beneficiaryForm.value);
     if (this.beneficiaryForm.valid) {
+      // Usar getRawValue() para incluir campos deshabilitados
+      const formData = this.beneficiaryForm.getRawValue();
+      
       const dataToSend = {
-        beneficiario: this.beneficiaryForm.value,
+        beneficiario: formData,
         servicios_basicos: this.selectedServiciosBasicos,
         apoderado: (this.mostrarApoderado) ? this.prepareApoderadoData() : null,
       };
-      console.log(this.beneficiaryForm.value);
-      
       console.log('✅ Datos para enviar al backend:', dataToSend);
       
       try {
@@ -485,6 +529,16 @@ export class BeneficiaryRegistrationComponent implements OnInit {
           );
           console.log('Respuesta del backend (actualización):', response);
           
+          // ✅ Si la actualización fue exitosa, registrar auditoría
+          if (response.success) {
+            await this.auditService.auditBeneficiaryChange(
+              'ACTUALIZACION',
+              this.currentBeneficiaryId,
+              this.originalBeneficiaryData, // Datos antes del cambio
+              dataToSend // Datos después del cambio
+            );
+          }
+          
           // Mostrar mensaje de éxito de actualización
           this.confirmationDialogService.showSuccess(
             '¡Actualización Exitosa!',
@@ -498,6 +552,21 @@ export class BeneficiaryRegistrationComponent implements OnInit {
           response = await this.beneficiaryRegistrationService.postCreateBeneficiary(dataToSend);
           console.log('Respuesta del backend (creación):', response);
           
+          // ✅ Si la creación fue exitosa, registrar auditoría
+          // Nota: En creación, necesitamos el ID del beneficiario creado
+          // Asumiendo que el backend retorna el ID en response.data o similar
+          if (response.success && response.data) {
+            // Si el backend retorna el ID del beneficiario creado
+            const newBeneficiaryId = typeof response.data === 'number' ? response.data : this.currentBeneficiaryId || 0;
+            
+            await this.auditService.auditBeneficiaryChange(
+              'CREACION',
+              newBeneficiaryId,
+              null, // No hay datos originales en creación
+              dataToSend // Todos los datos son nuevos
+            );
+          }
+          
           // Mostrar mensaje de éxito de creación
           this.confirmationDialogService.showSuccess(
             '¡Registro Exitoso!',
@@ -507,6 +576,9 @@ export class BeneficiaryRegistrationComponent implements OnInit {
             this.resetForm();
           });
         }
+      
+        // this.isDisabled = true;
+        // this.setLockedForm(this.isDisabled);
       } catch (error) {
         console.error('Error al guardar:', error);
         const mensaje = this.isEditMode 
@@ -551,11 +623,12 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     this.isDisabled = true; // Volver a deshabilitar el formulario
     this.isEditMode = false; // Desactivar modo edición
     this.currentBeneficiaryId = null; // Limpiar ID del beneficiario
+    this.originalBeneficiaryData = null; // Limpiar datos originales para auditoría
     this.setLockedForm(true); // Bloquear formulario
   }
 
   prepareApoderadoData(): any {
-    const form = this.beneficiaryForm.value;
+    const form = this.beneficiaryForm.getRawValue();
     if (form.apoderado_nombres) {
       return {
         nombres: form.apoderado_nombres,
@@ -650,6 +723,7 @@ export class BeneficiaryRegistrationComponent implements OnInit {
       numero_carnet_conadis: data.numeroCarnetConadis || '',
       tiene_certificado_discapacidad: data.tieneCertificadoDiscapacidad || false,
       id_grado_discapacidad: data.idGradoDiscapacidad,
+      id_grado_dependencia: data.idGradoDependencia,
       id_tipo_discapacidad: data.idTipoDiscapacidad,
       discapacidad_otro: data.discapacidadOtro || '',
       cie10: data.cie10 || '',
@@ -667,6 +741,7 @@ export class BeneficiaryRegistrationComponent implements OnInit {
       // Paso 5: Educación y Empleo
       labora_actualmente: data.laboraActualmente || false,
       lugar_trabajo: data.lugarTrabajo || '',
+      id_rango_salarial: data.idRangoSalarial || null,
       funcion_desempena: data.funcionDesempena || '',
       id_grado_instruccion: data.idGradoInstruccion,
       centro_estudios: data.centroEstudios || '',
@@ -702,9 +777,21 @@ export class BeneficiaryRegistrationComponent implements OnInit {
     this.isDisabled = false;
     this.setLockedForm(false);
 
+    // Deshabilitar campos no modificables en modo edición
+    this.disableNonEditableFields();
+
     this.mostrarApoderado = data.idParentescoApoderado ? true : false;
     
+    // ✅ Guardar snapshot de datos originales en el mismo formato que dataToSend
+    // Usar getRawValue() para incluir campos deshabilitados en el snapshot
+    this.originalBeneficiaryData = {
+      beneficiario: { ...this.beneficiaryForm.getRawValue() },
+      servicios_basicos: [...this.selectedServiciosBasicos],
+      apoderado: this.mostrarApoderado ? this.prepareApoderadoData() : null
+    };
+    
     console.log('✅ Datos del beneficiario cargados en el formulario');
+    console.log('📸 Snapshot de datos originales guardado:', this.originalBeneficiaryData);
   }
 
   private markAllAsTouched(): void {
@@ -712,6 +799,21 @@ export class BeneficiaryRegistrationComponent implements OnInit {
       const control = this.beneficiaryForm.get(key);
       control?.markAsTouched();
     });
+  }
+
+  /**
+   * Deshabilita campos que no deben ser modificables en modo edición
+   * - Nombres completos
+   * - Fecha de nacimiento
+   * - Sexo
+   */
+  private disableNonEditableFields(): void {
+    this.beneficiaryForm.get('nombres_completos')?.disable();
+    this.beneficiaryForm.get('id_nacionalidad')?.disable();
+    this.beneficiaryForm.get('nacionalidad_otro')?.disable();
+    this.beneficiaryForm.get('fecha_nacimiento')?.disable();
+    this.beneficiaryForm.get('edad_texto')?.disable();
+    this.beneficiaryForm.get('sexo')?.disable();
   }
 
   // Getters para validaciones

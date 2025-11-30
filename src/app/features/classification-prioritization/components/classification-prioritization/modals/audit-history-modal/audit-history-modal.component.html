@@ -1,0 +1,122 @@
+<!-- Modal Backdrop -->
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <!-- Modal Container -->
+  <div class="modal-container">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-content">
+        <h2>Bitácora de Cambios</h2>
+        <p class="beneficiary-name" *ngIf="beneficiaryName">{{ beneficiaryName }}</p>
+      </div>
+      <button class="close-btn" (click)="onClose()" type="button" title="Cerrar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- Loading State -->
+      <div class="loading-container" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>Cargando historial de cambios...</p>
+      </div>
+
+      <!-- Error State -->
+      <div class="error-message" *ngIf="errorMessage && !isLoading">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>{{ errorMessage }}</span>
+        <button class="retry-btn" (click)="loadAuditHistory()" type="button">Reintentar</button>
+      </div>
+
+      <!-- Timeline -->
+      <div class="timeline-container">
+        <div class="timeline-item" *ngFor="let item of historyData">
+          <!-- Timeline Dot -->
+          <div class="timeline-dot" [ngClass]="getOperationClass(item.tipoOperacion)"></div>
+          
+          <!-- Timeline Content -->
+          <div class="timeline-content">
+            <!-- Header -->
+            <div class="timeline-header">
+              <div class="header-left">
+                <span class="operation-badge" [ngClass]="getOperationClass(item.tipoOperacion)">
+                  {{ getOperationIcon(item.tipoOperacion) }} {{ item.tipoOperacion }}
+                </span>
+                <span class="user-badge">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                  {{ item.usuario }}
+                </span>
+              </div>
+              <div class="header-right">
+                <span class="date-badge">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  {{ formatDate(item.fechaRegistro) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Changes List -->
+            <div class="changes-list">
+              <div class="change-item" *ngFor="let cambio of item.cambios" [ngClass]="getChangeTypeClass(cambio.tipoCambio)">
+                <div class="change-header">
+                  <span class="field-name">{{ cambio.campoLegible }}</span>
+                  <span class="change-type-badge">{{ cambio.tipoCambio }}</span>
+                </div>
+                
+                <div class="change-values">
+                  <div class="value-box old-value" *ngIf="cambio.valorAnterior">
+                    <span class="value-label">Anterior:</span>
+                    <span class="value-content">{{ parseValue(cambio.valorAnterior) }}</span>
+                  </div>
+                  
+                  <div class="arrow" *ngIf="cambio.valorAnterior && cambio.valorNuevo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </div>
+                  
+                  <div class="value-box new-value" *ngIf="cambio.valorNuevo">
+                    <span class="value-label">Nuevo:</span>
+                    <span class="value-content">{{ parseValue(cambio.valorNuevo) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!isLoading && !errorMessage && historyData.length === 0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        <h3>Sin Historial</h3>
+        <p>No hay cambios registrados para este beneficiario.</p>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="btn-close" (click)="onClose()" type="button">Cerrar</button>
+    </div>
+  </div>
+</div>
