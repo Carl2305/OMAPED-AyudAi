@@ -121,7 +121,7 @@ export class BeneficiaryRegistrationComponent implements OnInit {
   ];
 
   rango_salariales = [
-    { id: 1, nombre: '0 - 1500' },
+    { id: 1, nombre: '1 - 1500' },
     { id: 2, nombre: '1501 - 2500' },
     { id: 3, nombre: '2501 - 3500' },
     { id: 4, nombre: 'Más de 3500' }
