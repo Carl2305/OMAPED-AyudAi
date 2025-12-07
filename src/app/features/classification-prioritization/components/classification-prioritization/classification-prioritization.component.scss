@@ -555,6 +555,48 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0
     color: $secondary-color;
     font-style: italic;
   }
+
+  // Nuevos estilos para las columnas agregadas
+  .risk-badge {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &.risk-high {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
+
+    &.risk-medium {
+      background-color: #fef3c7;
+      color: #f59e0b;
+    }
+
+    &.risk-low {
+      background-color: #d1fae5;
+      color: #10b981;
+    }
+
+    &.risk-unknown {
+      background-color: $background-gray;
+      color: $secondary-color;
+    }
+  }
+
+  .score {
+    font-weight: 600;
+    color: $primary-color;
+    font-size: 0.9375rem;
+  }
+
+  .income-range {
+    color: #374151;
+    font-size: 0.875rem;
+  }
 }
 
 // Action Buttons
@@ -606,12 +648,21 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0
     }
   }
 
-  &.btn-priority {
-    color: $success-color;
+  &.btn-shap {
+    color: #8b5cf6; // purple
     
     &:hover {
-      background-color: #f0fdf4;
-      border-color: $success-color;
+      background-color: #faf5ff;
+      border-color: #8b5cf6;
+    }
+  }
+
+  &.btn-history {
+    color: $secondary-color;
+    
+    &:hover {
+      //background-color: $gray-100;
+      border-color: $secondary-color;
     }
   }
 }

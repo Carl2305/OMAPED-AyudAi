@@ -5,11 +5,12 @@ import { ClassificationPrioritizationService } from '@features/classification-pr
 import { BeneficiaryListItem, PagedResponse } from '@core/models/beneficiary/beneficiary-list-item.interface';
 import { ExcelExportService } from '@shared/utils/services/excel-export/excel-export.service';
 import { AuditHistoryModalComponent } from './modals/audit-history-modal/audit-history-modal.component';
+import { ShapExplanationModalComponent } from './modals/shap-explanation-modal/shap-explanation-modal.component';
 
 @Component({
   selector: 'app-classification-prioritization',
   standalone: true,
-  imports: [CommonModule, FormsModule, AuditHistoryModalComponent],
+  imports: [CommonModule, FormsModule, AuditHistoryModalComponent, ShapExplanationModalComponent],
   templateUrl: './classification-prioritization.component.html',
   styleUrl: './classification-prioritization.component.scss'
 })
@@ -38,6 +39,11 @@ export class ClassificationPrioritizationComponent implements OnInit {
   showAuditModal: boolean = false;
   selectedBeneficiaryId: number | null = null;
   selectedBeneficiaryName: string = '';
+  
+  // Modal de explicación SHAP
+  showShapModal: boolean = false;
+  shapBeneficiaryId: number | null = null;
+  shapBeneficiaryName: string = '';
   
   // Opciones de tamaño de página
   pageSizeOptions: number[] = [10, 20, 50, 100];
@@ -217,6 +223,9 @@ export class ClassificationPrioritizationComponent implements OnInit {
       nombreCompleto: 'Nombre Completo',
       tipoDiscapacidad: 'Tipo de Discapacidad',
       edad: 'Edad',
+      nivelRiesgo: 'Nivel de Riesgo',
+      scoreModelo: 'Score del Modelo',
+      rangoIngresos: 'Rango de Ingresos',
       serviciosBasicos: 'Servicios Básicos'
     };
 
@@ -255,7 +264,10 @@ export class ClassificationPrioritizationComponent implements OnInit {
           nombreCompleto: 'Nombre Completo',
           tipoDiscapacidad: 'Tipo de Discapacidad',
           edad: 'Edad',
-          serviciosBasicos: 'Servicios Básicos'
+          serviciosBasicos: 'Servicios Básicos',
+          nivelRiesgo: 'Nivel de Riesgo',
+          scoreModelo: 'Score del Modelo',
+          rangoIngresos: 'Rango de Ingresos'
         };
 
         this.excelExportService.exportToExcelWithStyles(
@@ -293,5 +305,40 @@ export class ClassificationPrioritizationComponent implements OnInit {
     this.showAuditModal = false;
     this.selectedBeneficiaryId = null;
     this.selectedBeneficiaryName = '';
+  }
+
+  /**
+   * Abre el modal de explicación SHAP
+   */
+  openShapExplanation(beneficiary: BeneficiaryListItem): void {
+    this.shapBeneficiaryId = beneficiary.idBeneficiario;
+    this.shapBeneficiaryName = beneficiary.nombreCompleto;
+    this.showShapModal = true;
+  }
+
+  /**
+   * Cierra el modal de explicación SHAP
+   */
+  closeShapModal(): void {
+    this.showShapModal = false;
+    this.shapBeneficiaryId = null;
+    this.shapBeneficiaryName = '';
+  }
+
+  /**
+   * Obtiene la clase CSS según el nivel de riesgo
+   */
+  getRiskClass(nivelRiesgo: string): string {
+    const riesgo = nivelRiesgo?.toUpperCase();
+    switch (riesgo) {
+      case 'ALTO':
+        return 'risk-high';
+      case 'MEDIO':
+        return 'risk-medium';
+      case 'BAJO':
+        return 'risk-low';
+      default:
+        return 'risk-unknown';
+    }
   }
 }
