@@ -35,6 +35,10 @@ export class ClassificationPrioritizationComponent implements OnInit {
   searchDocument: string = '';
   private searchTimeout: any;
   
+  // Ordenamiento
+  sortColumn: string = 'nivelRiesgo';
+  sortDirection: 'asc' | 'desc' = 'asc';
+  
   // Modal de auditoría
   showAuditModal: boolean = false;
   selectedBeneficiaryId: number | null = null;
@@ -81,6 +85,9 @@ export class ClassificationPrioritizationComponent implements OnInit {
             beneficiary.numeroDocumento.toLowerCase().includes(searchTerm)
           );
         }
+        
+        // Ordenar por nivel de riesgo: ALTO > MEDIO > BAJO
+        filteredItems = this.sortByRiskLevel(filteredItems);
         
         this.beneficiaries = filteredItems;
         this.currentPage = pagedData.pageNumber;
@@ -340,5 +347,107 @@ export class ClassificationPrioritizationComponent implements OnInit {
       default:
         return 'risk-unknown';
     }
+  }
+
+  /**
+   * Ordena los beneficiarios por nivel de riesgo: ALTO > MEDIO > BAJO
+   */
+  private sortByRiskLevel(beneficiaries: BeneficiaryListItem[]): BeneficiaryListItem[] {
+    const riskOrder: { [key: string]: number } = {
+      'ALTO': 1,
+      'MEDIO': 2,
+      'BAJO': 3
+    };
+
+    return beneficiaries.sort((a, b) => {
+      const riskA = a.nivelRiesgo?.toUpperCase() || 'ZZZZZ';
+      const riskB = b.nivelRiesgo?.toUpperCase() || 'ZZZZZ';
+      
+      const orderA = riskOrder[riskA] || 999;
+      const orderB = riskOrder[riskB] || 999;
+      
+      return orderA - orderB;
+    });
+  }
+
+  /**
+   * Ordena la tabla por la columna seleccionada
+   */
+  sortBy(column: string): void {
+    // Si es la misma columna, invertir dirección
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      // Nueva columna, ordenar ascendente por defecto
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+
+    this.beneficiaries = this.sortBeneficiaries(this.beneficiaries);
+  }
+
+  /**
+   * Ordena los beneficiarios según la columna y dirección seleccionadas
+   */
+  private sortBeneficiaries(beneficiaries: BeneficiaryListItem[]): BeneficiaryListItem[] {
+    return beneficiaries.sort((a, b) => {
+      let valueA: any;
+      let valueB: any;
+
+      // Obtener valores según la columna
+      switch (this.sortColumn) {
+        case 'tipoDocumento':
+          valueA = a.tipoDocumento || '';
+          valueB = b.tipoDocumento || '';
+          break;
+        case 'numeroDocumento':
+          valueA = a.numeroDocumento || '';
+          valueB = b.numeroDocumento || '';
+          break;
+        case 'nombreCompleto':
+          valueA = a.nombreCompleto || '';
+          valueB = b.nombreCompleto || '';
+          break;
+        case 'tipoDiscapacidad':
+          valueA = a.tipoDiscapacidad || '';
+          valueB = b.tipoDiscapacidad || '';
+          break;
+        case 'edad':
+          valueA = a.edad || 0;
+          valueB = b.edad || 0;
+          break;
+        case 'nivelRiesgo':
+          // Ordenamiento especial para nivel de riesgo
+          const riskOrder: { [key: string]: number } = { 'ALTO': 1, 'MEDIO': 2, 'BAJO': 3 };
+          valueA = riskOrder[a.nivelRiesgo?.toUpperCase() || ''] || 999;
+          valueB = riskOrder[b.nivelRiesgo?.toUpperCase() || ''] || 999;
+          break;
+        case 'scoreModelo':
+          valueA = a.scoreModelo || 0;
+          valueB = b.scoreModelo || 0;
+          break;
+        case 'rangoIngresos':
+          valueA = a.rangoIngresos || '';
+          valueB = b.rangoIngresos || '';
+          break;
+        case 'serviciosBasicos':
+          valueA = a.serviciosBasicos || '';
+          valueB = b.serviciosBasicos || '';
+          break;
+        default:
+          return 0;
+      }
+
+      // Comparar valores
+      let comparison = 0;
+      if (typeof valueA === 'string') {
+        comparison = valueA.localeCompare(valueB);
+      } else {
+        comparison = valueA - valueB;
+      }
+
+      // Aplicar dirección
+      return this.sortDirection === 'asc' ? comparison : -comparison;
+    });
   }
 }

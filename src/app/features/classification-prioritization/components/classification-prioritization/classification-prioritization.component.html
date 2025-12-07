@@ -137,15 +137,96 @@
       <table class="beneficiaries-table" *ngIf="beneficiaries.length > 0">
         <thead>
           <tr>
-            <th>Tipo Doc.</th>
-            <th>N° Documento</th>
-            <th>Beneficiario</th>
-            <th>Tipo Discapacidad</th>
-            <th>Edad</th>
-            <th>Nivel de Riesgo</th>
-            <th>Score ML</th>
-            <th>Ingresos (S/)</th>
-            <th>Servicios Básicos</th>
+            <th>
+              <button class="sort-header" (click)="sortBy('tipoDocumento')" type="button">
+                <span>Tipo Doc.</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+                     [class.active]="sortColumn === 'tipoDocumento'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
+                  <path d="m7 15 5 5 5-5"></path>
+                  <path d="m7 9 5-5 5 5"></path>
+                </svg>
+              </button>
+            </th>
+            <th>
+              <button class="sort-header" (click)="sortBy('numeroDocumento')" type="button">
+                <span>N° Documento</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     [class.active]="sortColumn === 'numeroDocumento'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
+                  <path d="m7 15 5 5 5-5"></path>
+                  <path d="m7 9 5-5 5 5"></path>
+                </svg>
+              </button>
+            </th>
+            <th>
+              <button class="sort-header" (click)="sortBy('nombreCompleto')" type="button">
+                <span>Beneficiario</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     [class.active]="sortColumn === 'nombreCompleto'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
+                  <path d="m7 15 5 5 5-5"></path>
+                  <path d="m7 9 5-5 5 5"></path>
+                </svg>
+              </button>
+            </th>
+            <th>
+              <button class="sort-header" (click)="sortBy('tipoDiscapacidad')" type="button">
+                <span>Tipo Discapacidad</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     [class.active]="sortColumn === 'tipoDiscapacidad'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
+                  <path d="m7 15 5 5 5-5"></path>
+                  <path d="m7 9 5-5 5 5"></path>
+                </svg>
+              </button>
+            </th>
+            <th>
+              <button class="sort-header" (click)="sortBy('edad')" type="button">
+                <span>Edad</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     [class.active]="sortColumn === 'edad'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
+                  <path d="m7 15 5 5 5-5"></path>
+                  <path d="m7 9 5-5 5 5"></path>
+                </svg>
+              </button>
+            </th>
+            <th>
+              <button class="sort-header" (click)="sortBy('nivelRiesgo')" type="button">
+                <span>Nivel de Riesgo</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     [class.active]="sortColumn === 'nivelRiesgo'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
+                  <path d="m7 15 5 5 5-5"></path>
+                  <path d="m7 9 5-5 5 5"></path>
+                </svg>
+              </button>
+            </th>
+            <th>
+              <button class="sort-header" (click)="sortBy('scoreModelo')" type="button">
+                <span>Score ML</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     [class.active]="sortColumn === 'scoreModelo'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
+                  <path d="m7 15 5 5 5-5"></path>
+                  <path d="m7 9 5-5 5 5"></path>
+                </svg>
+              </button>
+            </th>
+            <th>
+              <button class="sort-header" (click)="sortBy('rangoIngresos')" type="button">
+                <span>Ingresos (S/)</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     [class.active]="sortColumn === 'rangoIngresos'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
+                  <path d="m7 15 5 5 5-5"></path>
+                  <path d="m7 9 5-5 5 5"></path>
+                </svg>
+              </button>
+            </th>
+            <th>
+              <button class="sort-header" (click)="sortBy('serviciosBasicos')" type="button">
+                <span>Servicios Básicos</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     [class.active]="sortColumn === 'serviciosBasicos'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
+                  <path d="m7 15 5 5 5-5"></path>
+                  <path d="m7 9 5-5 5 5"></path>
+                </svg>
+              </button>
+            </th>
             <th class="actions-column">Acciones</th>
           </tr>
         </thead>
@@ -175,7 +256,7 @@
               <span class="score">{{ beneficiary.scoreModelo ? beneficiary.scoreModelo.toFixed(2) : '-' }}</span>
             </td>
             <td>
-              <span class="income-range">{{ beneficiary.rangoIngresos || '-' }}</span>
+              <span class="income-range">{{ beneficiary.rangoIngresos || 0 }}</span>
             </td>
             <td>
               <span class="services" *ngIf="beneficiary.serviciosBasicos; else noServices">
