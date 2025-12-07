@@ -1,0 +1,105 @@
+<div class="modal-overlay" (click)="close()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-content">
+        <h2>Explicación SHAP - {{ beneficiarioNombre }}</h2>
+        <p class="subtitle">Análisis detallado de los factores que influyen en la clasificación de riesgo del beneficiario</p>
+      </div>
+      <button class="close-button" (click)="close()" aria-label="Cerrar modal">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando explicación SHAP...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="!isLoading && errorMessage" class="error-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <p>{{ errorMessage }}</p>
+        <button class="btn-retry" (click)="loadShapExplanation()">Reintentar</button>
+      </div>
+
+      <!-- Content -->
+      <div *ngIf="!isLoading && !errorMessage && shapData" class="content">
+        <!-- Resumen de Clasificación -->
+        <div class="summary-section">
+          <div class="summary-content">
+            <h3>Resumen de Clasificación</h3>
+            <div class="summary-row">
+              <span class="summary-label">Score del Modelo</span>
+              <span class="summary-label">Índice Prioridad Operativa (IPO)</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-value">{{ (shapData.confianza).toFixed(2) }}</span>
+              <span class="summary-value">{{ getIPO() }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Factores Más Influyentes -->
+        <div class="features-section">
+          <h3>Factores Más Influyentes (SHAP Values)</h3>
+          <div class="features-list">
+            <div *ngFor="let feature of topFeatures" class="feature-item">
+              <div class="feature-row">
+                <span class="feature-name">{{ getFeatureLabel(feature.feature_name) }}</span>
+                <div class="feature-bar-wrapper">
+                  <div class="feature-bar-track">
+                    <div class="feature-bar" 
+                         [style.width.%]="getBarWidth(feature.shap_value)"
+                         [style.background-color]="getBarColor(feature.impact)">
+                    </div>
+                  </div>
+                  <span class="feature-percentage" [style.color]="getBarColor(feature.impact)">
+                    {{ getPercentageLabel(feature.shap_value) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interpretación -->
+        <div class="interpretation-section">
+          <h3>Interpretación</h3>
+          <div class="interpretation-content">
+            <p>
+              Los factores en <strong style="color: #dc2626;">rojo</strong> incrementan el riesgo, 
+              mientras que los factores en <strong style="color: #10b981;">verde</strong> lo reducen. 
+              El modelo considera múltiples variables para determinar la prioridad de atención.
+            </p>
+            <div class="legend">
+              <div class="legend-item">
+                <div class="legend-color" style="background-color: #dc2626;"></div>
+                <span>Aumenta riesgo (impacto negativo)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background-color: #10b981;"></div>
+                <span>Reduce riesgo (impacto positivo)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background-color: #d1d5db;"></div>
+                <span>Neutral (sin impacto significativo)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
