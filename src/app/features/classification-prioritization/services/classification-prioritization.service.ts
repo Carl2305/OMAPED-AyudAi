@@ -5,7 +5,7 @@ import { environment } from '@environments/environment';
 import { ApiResponse } from '@core/models/response/api-response-base.module';
 import { BeneficiaryListItem, PagedResponse } from '@core/models/beneficiary/beneficiary-list-item.interface';
 import { AuditHistoryItem } from '@core/models/audit/audit-history.interface';
-import { ShapExplanationResponse } from '@features/classification-prioritization/models/shap-explanation.interface';
+import { ShapExplanationResponse } from '@core/models/classification-prioritization/shap-explanation.interface';
 
 @Injectable({
   providedIn: 'root'

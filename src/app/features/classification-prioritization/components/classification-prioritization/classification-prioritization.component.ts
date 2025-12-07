@@ -223,6 +223,9 @@ export class ClassificationPrioritizationComponent implements OnInit {
       nombreCompleto: 'Nombre Completo',
       tipoDiscapacidad: 'Tipo de Discapacidad',
       edad: 'Edad',
+      nivelRiesgo: 'Nivel de Riesgo',
+      scoreModelo: 'Score del Modelo',
+      rangoIngresos: 'Rango de Ingresos',
       serviciosBasicos: 'Servicios Básicos'
     };
 
@@ -261,7 +264,10 @@ export class ClassificationPrioritizationComponent implements OnInit {
           nombreCompleto: 'Nombre Completo',
           tipoDiscapacidad: 'Tipo de Discapacidad',
           edad: 'Edad',
-          serviciosBasicos: 'Servicios Básicos'
+          serviciosBasicos: 'Servicios Básicos',
+          nivelRiesgo: 'Nivel de Riesgo',
+          scoreModelo: 'Score del Modelo',
+          rangoIngresos: 'Rango de Ingresos'
         };
 
         this.excelExportService.exportToExcelWithStyles(
@@ -317,5 +323,22 @@ export class ClassificationPrioritizationComponent implements OnInit {
     this.showShapModal = false;
     this.shapBeneficiaryId = null;
     this.shapBeneficiaryName = '';
+  }
+
+  /**
+   * Obtiene la clase CSS según el nivel de riesgo
+   */
+  getRiskClass(nivelRiesgo: string): string {
+    const riesgo = nivelRiesgo?.toUpperCase();
+    switch (riesgo) {
+      case 'ALTO':
+        return 'risk-high';
+      case 'MEDIO':
+        return 'risk-medium';
+      case 'BAJO':
+        return 'risk-low';
+      default:
+        return 'risk-unknown';
+    }
   }
 }

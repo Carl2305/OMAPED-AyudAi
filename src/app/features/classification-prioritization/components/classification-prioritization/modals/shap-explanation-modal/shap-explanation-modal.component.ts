@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ClassificationPrioritizationService } from '@features/classification-prioritization/services/classification-prioritization.service';
-import { ShapExplanationResponse, ShapFeatureExplanation } from '@features/classification-prioritization/models/shap-explanation.interface';
+import { ShapExplanationResponse, ShapFeatureExplanation } from '@core/models/classification-prioritization/shap-explanation.interface';
 
 @Component({
   selector: 'app-shap-explanation-modal',
@@ -163,18 +163,21 @@ export class ShapExplanationModalComponent implements OnInit {
   }
 
   /**
-   * Formatea la fecha de predicción
+   * Formatea la fecha de predicción en formato dd/MM/yyyy hh:mm:ss
    */
   getFormattedDate(): string {
     if (!this.shapData) return '';
     
     const date = new Date(this.shapData.fecha_prediccion);
-    return date.toLocaleDateString('es-PE', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    const milliseconds = date.getMilliseconds().toString().padStart(3, '0').substring(0, 2);
+    
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} ${milliseconds}`;
   }
 }

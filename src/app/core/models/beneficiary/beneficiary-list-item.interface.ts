@@ -6,6 +6,9 @@ export interface BeneficiaryListItem {
   tipoDiscapacidad: string;
   serviciosBasicos: string | null;
   edad: number;
+  nivelRiesgo: string;
+  scoreModelo: number;
+  rangoIngresos: string;
 }
 
 export interface PagedResponse<T> {

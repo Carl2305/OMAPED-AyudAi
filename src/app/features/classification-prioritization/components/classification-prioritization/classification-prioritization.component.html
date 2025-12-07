@@ -138,10 +138,13 @@
         <thead>
           <tr>
             <th>Tipo Doc.</th>
-            <th>Número Documento</th>
-            <th>Nombre Completo</th>
-            <th>Tipo de Discapacidad</th>
+            <th>N° Documento</th>
+            <th>Beneficiario</th>
+            <th>Tipo Discapacidad</th>
             <th>Edad</th>
+            <th>Nivel de Riesgo</th>
+            <th>Score ML</th>
+            <th>Ingresos (S/)</th>
             <th>Servicios Básicos</th>
             <th class="actions-column">Acciones</th>
           </tr>
@@ -162,6 +165,17 @@
             </td>
             <td>
               <span class="age">{{ beneficiary.edad }} años</span>
+            </td>
+            <td>
+              <span class="risk-badge" [ngClass]="getRiskClass(beneficiary.nivelRiesgo)">
+                {{ beneficiary.nivelRiesgo || '-' }}
+              </span>
+            </td>
+            <td>
+              <span class="score">{{ beneficiary.scoreModelo ? beneficiary.scoreModelo.toFixed(2) : '-' }}</span>
+            </td>
+            <td>
+              <span class="income-range">{{ beneficiary.rangoIngresos || '-' }}</span>
             </td>
             <td>
               <span class="services" *ngIf="beneficiary.serviciosBasicos; else noServices">
