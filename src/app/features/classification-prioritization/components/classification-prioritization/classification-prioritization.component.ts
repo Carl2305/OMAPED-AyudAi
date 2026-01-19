@@ -15,6 +15,9 @@ import { ShapExplanationModalComponent } from './modals/shap-explanation-modal/s
   styleUrl: './classification-prioritization.component.scss'
 })
 export class ClassificationPrioritizationComponent implements OnInit {
+  // Exponer Object para el template
+  Object = Object;
+  
   // Datos de la tabla
   beneficiaries: BeneficiaryListItem[] = [];
   
@@ -34,6 +37,27 @@ export class ClassificationPrioritizationComponent implements OnInit {
   // Búsqueda
   searchDocument: string = '';
   private searchTimeout: any;
+  
+  // Filtros estilo Excel
+  columnFilters: { [key: string]: Set<string> } = {};
+  filterOptions: { [key: string]: string[] } = {};
+  activeFilterColumn: string | null = null;
+  
+  // Lista de todas las columnas filtrables
+  filterableColumns = [
+    { key: 'tipoDocumento', label: 'Tipo Doc.' },
+    { key: 'numeroDocumento', label: 'N° Documento' },
+    { key: 'nombreCompleto', label: 'Beneficiario' },
+    { key: 'tipoDiscapacidad', label: 'Tipo Discapacidad' },
+    { key: 'edad', label: 'Edad' },
+    { key: 'rangoIngresos', label: 'Ingresos (S/)' },
+    { key: 'nivelRiesgo', label: 'Nivel de Riesgo' },
+    { key: 'scoreModelo', label: 'Score ML' },
+    //{ key: 'serviciosBasicos', label: 'Servicios Básicos' }
+  ];
+  
+  // Datos originales sin filtrar
+  allBeneficiaries: BeneficiaryListItem[] = [];
   
   // Ordenamiento
   sortColumn: string = 'nivelRiesgo';
@@ -77,14 +101,24 @@ export class ClassificationPrioritizationComponent implements OnInit {
       if (response.success && response.data) {
         const pagedData = response.data;
         
-        // Aplicar filtro local por número de documento si existe búsqueda
-        let filteredItems = pagedData.items;
+        // Guardar datos originales
+        this.allBeneficiaries = pagedData.items;
+        
+        // Construir opciones de filtro para cada columna
+        this.buildFilterOptions();
+        
+        // Aplicar filtro local por búsqueda si existe
+        let filteredItems = this.allBeneficiaries;
         if (this.searchDocument && this.searchDocument.trim() !== '') {
           const searchTerm = this.searchDocument.trim().toLowerCase();
-          filteredItems = pagedData.items.filter(beneficiary => 
-            beneficiary.numeroDocumento.toLowerCase().includes(searchTerm)
+          filteredItems = filteredItems.filter(beneficiary => 
+            beneficiary.numeroDocumento.toLowerCase().includes(searchTerm) ||
+            beneficiary.nombreCompleto.toLowerCase().includes(searchTerm)
           );
         }
+        
+        // Aplicar filtros de columnas
+        filteredItems = this.applyColumnFilters(filteredItems);
         
         // Ordenar por nivel de riesgo: ALTO > MEDIO > BAJO
         filteredItems = this.sortByRiskLevel(filteredItems);
@@ -345,8 +379,191 @@ export class ClassificationPrioritizationComponent implements OnInit {
       case 'BAJO':
         return 'risk-low';
       default:
-        return 'risk-unknown';
+        return '';
     }
+  }
+
+  /**
+   * Construye las opciones de filtro para cada columna desde los datos
+   */
+  private buildFilterOptions(): void {
+    this.filterOptions = {};
+    
+    this.filterableColumns.forEach(column => {
+      const uniqueValues = new Set<string>();
+      
+      this.allBeneficiaries.forEach(item => {
+        let value = (item as any)[column.key];
+        
+        if (value !== null && value !== undefined) {
+          // Formatear valores según el tipo
+          if (column.key === 'scoreModelo') {
+            value = value.toFixed(2);
+          } else if (column.key === 'edad') {
+            value = `${value} años`;
+          } else {
+            value = String(value);
+          }
+          uniqueValues.add(value);
+        }
+      });
+      
+      this.filterOptions[column.key] = Array.from(uniqueValues).sort();
+    });
+  }
+
+  /**
+   * Aplica los filtros de columnas a los beneficiarios
+   */
+  private applyColumnFilters(beneficiaries: BeneficiaryListItem[]): BeneficiaryListItem[] {
+    let filtered = [...beneficiaries];
+
+    // Aplicar cada filtro de columna activo
+    Object.keys(this.columnFilters).forEach(columnKey => {
+      const selectedValues = this.columnFilters[columnKey];
+      if (selectedValues && selectedValues.size > 0) {
+        filtered = filtered.filter(item => {
+          let value = (item as any)[columnKey];
+          
+          // Formatear el valor de la misma manera que en buildFilterOptions
+          if (value !== null && value !== undefined) {
+            if (columnKey === 'scoreModelo') {
+              value = value.toFixed(2);
+            } else if (columnKey === 'edad') {
+              value = `${value} años`;
+            } else {
+              value = String(value);
+            }
+            return selectedValues.has(value);
+          }
+          return false;
+        });
+      }
+    });
+
+    return filtered;
+  }
+
+  /**
+   * Toggle del dropdown de filtro para una columna
+   */
+  toggleFilterDropdown(columnKey: string, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    
+    if (this.activeFilterColumn === columnKey) {
+      this.activeFilterColumn = null;
+    } else {
+      this.activeFilterColumn = columnKey;
+    }
+  }
+
+  /**
+   * Cierra el dropdown de filtro
+   */
+  closeFilterDropdown(): void {
+    this.activeFilterColumn = null;
+  }
+
+  /**
+   * Toggle de un valor de filtro
+   */
+  toggleFilterValue(columnKey: string, value: string): void {
+    if (!this.columnFilters[columnKey]) {
+      this.columnFilters[columnKey] = new Set<string>();
+    }
+    
+    const filterSet = this.columnFilters[columnKey];
+    if (filterSet.has(value)) {
+      filterSet.delete(value);
+      if (filterSet.size === 0) {
+        delete this.columnFilters[columnKey];
+      }
+    } else {
+      filterSet.add(value);
+    }
+    
+    this.applyFiltersAndReload();
+  }
+
+  /**
+   * Verifica si un valor está seleccionado en el filtro
+   */
+  isFilterValueSelected(columnKey: string, value: string): boolean {
+    return this.columnFilters[columnKey]?.has(value) || false;
+  }
+
+  /**
+   * Selecciona todos los valores de un filtro
+   */
+  selectAllFilterValues(columnKey: string): void {
+    if (!this.filterOptions[columnKey]) return;
+    
+    this.columnFilters[columnKey] = new Set(this.filterOptions[columnKey]);
+    this.applyFiltersAndReload();
+  }
+
+  /**
+   * Deselecciona todos los valores de un filtro
+   */
+  clearColumnFilter(columnKey: string): void {
+    delete this.columnFilters[columnKey];
+    this.applyFiltersAndReload();
+  }
+
+  /**
+   * Aplica los filtros y recarga la vista
+   */
+  private applyFiltersAndReload(): void {
+    let filteredItems = this.allBeneficiaries;
+    
+    // Aplicar búsqueda
+    if (this.searchDocument && this.searchDocument.trim() !== '') {
+      const searchTerm = this.searchDocument.trim().toLowerCase();
+      filteredItems = filteredItems.filter(beneficiary => 
+        beneficiary.numeroDocumento.toLowerCase().includes(searchTerm) ||
+        beneficiary.nombreCompleto.toLowerCase().includes(searchTerm)
+      );
+    }
+    
+    // Aplicar filtros de columnas
+    filteredItems = this.applyColumnFilters(filteredItems);
+    
+    // Ordenar
+    filteredItems = this.sortByRiskLevel(filteredItems);
+    
+    this.beneficiaries = filteredItems;
+    this.totalCount = filteredItems.length;
+  }
+
+  /**
+   * Limpia todos los filtros
+   */
+  clearAllFilters(): void {
+    this.columnFilters = {};
+    this.applyFiltersAndReload();
+  }
+
+  /**
+   * Verifica si una columna tiene filtros activos
+   */
+  hasColumnFilter(columnKey: string): boolean {
+    return this.columnFilters[columnKey]?.size > 0 || false;
+  }
+
+  /**
+   * Verifica si hay algún filtro activo
+   */
+  hasActiveFilters(): boolean {
+    return Object.keys(this.columnFilters).length > 0;
+  }
+
+  /**
+   * Cuenta cuántos filtros están activos en una columna
+   */
+  getActiveFilterCount(columnKey: string): number {
+    return this.columnFilters[columnKey]?.size || 0;
   }
 
   /**
