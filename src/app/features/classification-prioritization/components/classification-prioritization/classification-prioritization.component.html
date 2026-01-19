@@ -46,7 +46,7 @@
           </button>
         </div>
       </div>
-      
+
       <div class="table-controls">
         <!-- Page Size Selector -->
         <div class="page-size-control">
@@ -100,6 +100,15 @@
             <div class="spinner-small" *ngIf="isExporting"></div>
             <span class="btn-text">{{ isExporting ? 'Exportando...' : 'Exportar todo' }}</span>
           </button>
+
+
+          <button *ngIf="hasActiveFilters()" class="btn-clear-all-filters" (click)="clearAllFilters()" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            Limpiar los ({{ Object.keys(columnFilters).length }}) filtros
+        </button>
         </div>
       </div>
     </div>
@@ -122,7 +131,19 @@
     </div>
 
     <!-- Table Container -->
-    <div class="table-container" *ngIf="!isLoading && !errorMessage">
+    <div class="table-container" *ngIf="!isLoading && !errorMessage" (click)="closeFilterDropdown()">
+      <!-- Clear All Filters Button -->
+      <!-- <div class="clear-filters-bar" *ngIf="hasActiveFilters()">
+        <span>Filtros activos: {{ Object.keys(columnFilters).length }}</span>
+        <button class="btn-clear-all-filters" (click)="clearAllFilters()" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          Limpiar todos los filtros
+        </button>
+      </div> -->
+      
       <!-- Empty State -->
       <div class="empty-state" *ngIf="beneficiaries.length === 0">
         <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -137,95 +158,49 @@
       <table class="beneficiaries-table" *ngIf="beneficiaries.length > 0">
         <thead>
           <tr>
-            <th>
-              <button class="sort-header" (click)="sortBy('tipoDocumento')" type="button">
-                <span>Tipo Doc.</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
-                     [class.active]="sortColumn === 'tipoDocumento'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
-                  <path d="m7 15 5 5 5-5"></path>
-                  <path d="m7 9 5-5 5 5"></path>
-                </svg>
-              </button>
-            </th>
-            <th>
-              <button class="sort-header" (click)="sortBy('numeroDocumento')" type="button">
-                <span>N° Documento</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                     [class.active]="sortColumn === 'numeroDocumento'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
-                  <path d="m7 15 5 5 5-5"></path>
-                  <path d="m7 9 5-5 5 5"></path>
-                </svg>
-              </button>
-            </th>
-            <th>
-              <button class="sort-header" (click)="sortBy('nombreCompleto')" type="button">
-                <span>Beneficiario</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                     [class.active]="sortColumn === 'nombreCompleto'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
-                  <path d="m7 15 5 5 5-5"></path>
-                  <path d="m7 9 5-5 5 5"></path>
-                </svg>
-              </button>
-            </th>
-            <th>
-              <button class="sort-header" (click)="sortBy('tipoDiscapacidad')" type="button">
-                <span>Tipo Discapacidad</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                     [class.active]="sortColumn === 'tipoDiscapacidad'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
-                  <path d="m7 15 5 5 5-5"></path>
-                  <path d="m7 9 5-5 5 5"></path>
-                </svg>
-              </button>
-            </th>
-            <th>
-              <button class="sort-header" (click)="sortBy('edad')" type="button">
-                <span>Edad</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                     [class.active]="sortColumn === 'edad'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
-                  <path d="m7 15 5 5 5-5"></path>
-                  <path d="m7 9 5-5 5 5"></path>
-                </svg>
-              </button>
-            </th>
-            <th>
-              <button class="sort-header" (click)="sortBy('nivelRiesgo')" type="button">
-                <span>Nivel de Riesgo</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                     [class.active]="sortColumn === 'nivelRiesgo'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
-                  <path d="m7 15 5 5 5-5"></path>
-                  <path d="m7 9 5-5 5 5"></path>
-                </svg>
-              </button>
-            </th>
-            <th>
-              <button class="sort-header" (click)="sortBy('scoreModelo')" type="button">
-                <span>Score ML</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                     [class.active]="sortColumn === 'scoreModelo'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
-                  <path d="m7 15 5 5 5-5"></path>
-                  <path d="m7 9 5-5 5 5"></path>
-                </svg>
-              </button>
-            </th>
-            <th>
-              <button class="sort-header" (click)="sortBy('rangoIngresos')" type="button">
-                <span>Ingresos (S/)</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                     [class.active]="sortColumn === 'rangoIngresos'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
-                  <path d="m7 15 5 5 5-5"></path>
-                  <path d="m7 9 5-5 5 5"></path>
-                </svg>
-              </button>
-            </th>
-            <th>
-              <button class="sort-header" (click)="sortBy('serviciosBasicos')" type="button">
-                <span>Servicios Básicos</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                     [class.active]="sortColumn === 'serviciosBasicos'" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
-                  <path d="m7 15 5 5 5-5"></path>
-                  <path d="m7 9 5-5 5 5"></path>
-                </svg>
-              </button>
+            <th *ngFor="let column of filterableColumns">
+              <div class="header-cell">
+                <button class="sort-header" (click)="sortBy(column.key)" type="button">
+                  <span>{{ column.label }}</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+                       [class.active]="sortColumn === column.key" [class.asc]="sortDirection === 'asc'" [class.desc]="sortDirection === 'desc'">
+                    <path d="m7 15 5 5 5-5"></path>
+                    <path d="m7 9 5-5 5 5"></path>
+                  </svg>
+                </button>
+                <button class="filter-icon" 
+                        [class.has-filter]="hasColumnFilter(column.key)"
+                        (click)="toggleFilterDropdown(column.key, $event)" 
+                        type="button"
+                        title="Filtrar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                  </svg>
+                  <span class="filter-badge" *ngIf="hasColumnFilter(column.key)">{{ getActiveFilterCount(column.key) }}</span>
+                </button>
+                
+                <!-- Dropdown de filtro -->
+                <div class="filter-dropdown" *ngIf="activeFilterColumn === column.key" (click)="$event.stopPropagation()">
+                  <div class="filter-dropdown-header">
+                    <button class="filter-action-btn" (click)="selectAllFilterValues(column.key)" type="button">
+                      Seleccionar todo
+                    </button>
+                    <button class="filter-action-btn" (click)="clearColumnFilter(column.key)" type="button">
+                      Limpiar
+                    </button>
+                  </div>
+                  <div class="filter-dropdown-content">
+                    <label *ngFor="let value of filterOptions[column.key]" class="filter-option">
+                      <input 
+                        type="checkbox" 
+                        [checked]="isFilterValueSelected(column.key, value)"
+                        (change)="toggleFilterValue(column.key, value)"
+                      />
+                      <span>{{ value }}</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
             </th>
             <th class="actions-column">Acciones</th>
           </tr>
@@ -248,6 +223,9 @@
               <span class="age">{{ beneficiary.edad }} años</span>
             </td>
             <td>
+              <span class="income-range">{{ beneficiary.rangoIngresos || 0 }}</span>
+            </td>
+            <td>
               <span class="risk-badge" [ngClass]="getRiskClass(beneficiary.nivelRiesgo)">
                 {{ beneficiary.nivelRiesgo || '-' }}
               </span>
@@ -255,17 +233,14 @@
             <td>
               <span class="score">{{ beneficiary.scoreModelo ? beneficiary.scoreModelo.toFixed(2) : '-' }}</span>
             </td>
-            <td>
-              <span class="income-range">{{ beneficiary.rangoIngresos || 0 }}</span>
-            </td>
-            <td>
+            <!-- <td>
               <span class="services" *ngIf="beneficiary.serviciosBasicos; else noServices">
                 {{ beneficiary.serviciosBasicos }}
               </span>
               <ng-template #noServices>
                 <span class="no-data">-</span>
               </ng-template>
-            </td>
+            </td> -->
             <td class="actions-column">
               <div class="action-buttons">
                 <button 
